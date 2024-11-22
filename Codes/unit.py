@@ -60,15 +60,6 @@ class Unit(Skills):
         if 0 <= self.__x + dx < GRID_SIZE and 0 <= self.__y + dy < GRID_SIZE:
             self.__x += dx
             self.__y += dy
-
-    def draw(self, screen):
-        """Affiche l'unité sur l'écran."""
-        color = BLUE if self.team == 'player' else RED
-        if self.__is_selected:
-            pygame.draw.rect(screen, GREEN, (self.__x * CELL_SIZE,
-                             self.__y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-        pygame.draw.circle(screen, color, (self.__x * CELL_SIZE + CELL_SIZE //
-                           2, self.__y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
         
     @property
     def x(self):
@@ -85,6 +76,6 @@ class Unit(Skills):
     @is_selected.setter
     def is_selected(self, value):
         if not isinstance(value, bool):
-            raise ValueError("is_selected must be a boolean")
+            raise ValueError("is_selected doit être un booléen")
         self.__is_selected = value
         

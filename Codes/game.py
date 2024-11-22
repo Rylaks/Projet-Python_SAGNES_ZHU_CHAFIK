@@ -57,7 +57,7 @@ class Game:
         # Afficher les informations des unités (ennemi)
         y_offset += 20  # Séparateur
         for unit in self.enemy_units:
-            unit_info = f"{unit.nom} (Ennemi): PV={unit.health}"
+            unit_info = f"{unit.nom} (Ennemi): PV={unit.health}, Bouclier={unit.defense_shield}"
             unit_surface = font.render(unit_info, True, white)
             self.screen.blit(unit_surface, (x_offset, y_offset))
             y_offset += 30
@@ -65,9 +65,7 @@ class Game:
         # Instructions
         instructions = [
             "Déplacer: flèches",
-            "Attaquer: espace",
-            "Quitter: croix rouge",
-        ]
+            "Attaquer: espace"]
         y_offset += 20
         for instruction in instructions:
             instruction_surface = font.render(instruction, True, white)
@@ -80,11 +78,26 @@ class Game:
         for selected_unit in self.player_units:
 
             # Tant que l'unité n'a pas terminé son tour
-
             has_acted = False
             selected_unit.is_selected = True
             self.flip_display()
             while not has_acted:
+
+                # Affichage du joueur
+                # Police et position pour le texte
+                font = pygame.font.Font(None, 30)
+                white = (255, 255, 255)
+                y_offset = 10
+                x_offset = 600
+                unit_status = f"C'est à {selected_unit.nom} de jouer !"
+                unit_surface = font.render(unit_status, True, white)
+                self.screen.blit(unit_surface, (x_offset, y_offset))
+                # Mettre à jour l'affichage
+                pygame.display.flip()
+
+                # Si l'unité est un mage, il récupère 1 point de mana par tour
+                if isinstance(selected_unit,Mage):
+                    selected_unit.mana += 1
 
                 # Important: cette boucle permet de gérer les événements Pygame
                 for event in pygame.event.get():
@@ -118,8 +131,6 @@ class Game:
 
                             has_acted = True
                             selected_unit.is_selected = False
-
-                        #Affiche l'HUD
                         
 
     def handle_enemy_turn(self):
@@ -167,7 +178,7 @@ def main():
     pygame.init()
 
     # Instanciation de la fenêtre
-    screen = pygame.display.set_mode((900, 480))
+    screen = pygame.display.set_mode((1200, 480))
     pygame.display.set_caption("Mon jeu de stratégie")
 
     # Instanciation du jeu
