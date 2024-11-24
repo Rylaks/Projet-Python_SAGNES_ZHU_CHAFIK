@@ -13,9 +13,7 @@ RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 
-from skills import *
-
-class Unit(Skills):
+class Unit:
     """
     Classe pour représenter une unité et la déplacer.
 

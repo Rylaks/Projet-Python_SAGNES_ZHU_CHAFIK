@@ -1,7 +1,7 @@
-from unit import *
 from skills import *
+from unit import *
 
-class Mage(Unit,Skills):    #Mage: vitesse myenne, attaque elevée, boucliers et vie faibles
+class Mage(Unit,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers et vie faibles
     """
     Type d'unité mage
 

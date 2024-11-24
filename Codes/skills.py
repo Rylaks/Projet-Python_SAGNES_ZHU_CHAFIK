@@ -21,8 +21,9 @@ class Skills:
 
     #pour les voleurs:
     def invisibility(self):
-        """Porte l'anneau et se rend invisible (et donc intouchable) des unités ennemies"""
-        #chaque tour invisible coûte des points de bouclier (ça fatigue!), puis des points de vie quand le bouclier est à 0.
+        """Porte l'anneau et se rend invisible (et donc intouchable) des unités ennemies pour un tour"""
+        #coûte des points de bouclier (ça fatigue!), puis des points de vie quand le bouclier est à 0.
+        self.is_invisible = True
         if self.defense_shield > 0:
             self.defense_shield -= 1
         else:
@@ -30,7 +31,7 @@ class Skills:
 
     #pour les guerriers:
     def bow(self,target):
-        """Attaque à longue portée avec un arc"""
+        """Attaque (divisée par 2) à longue portée avec un arc"""
         if abs(self.x - target.x) <= 4 and abs(self.y - target.y) <= 4:
             if target.defense_shield >= round(self.attack_power*0.5):
                 target.defense_shield -= round(self.attack_power*0.5)

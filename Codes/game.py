@@ -3,6 +3,7 @@ import random
 
 from unit import *
 from personnages import *
+from skills import *
 
 class Game:
     """
@@ -46,31 +47,25 @@ class Game:
         white = (255, 255, 255)
 
         # Afficher les informations des unités (joueur)
-        y_offset = 50
+        y_offset = 300
         x_offset = 490
+        unit_info = f"Statistiques:"
+        unit_surface = font.render(unit_info, True, white)
+        self.screen.blit(unit_surface, (x_offset, y_offset))
+        y_offset += 20
         for unit in self.player_units:
-            unit_info = f"{unit.nom}: PV={unit.health}, Bouclier={unit.defense_shield}"
+            unit_info = f" - {unit.nom}: PV = {unit.health}, Bouclier = {unit.defense_shield}"
             unit_surface = font.render(unit_info, True, white)
             self.screen.blit(unit_surface, (x_offset, y_offset))
-            y_offset += 30
+            y_offset += 20
 
         # Afficher les informations des unités (ennemi)
         y_offset += 20  # Séparateur
         for unit in self.enemy_units:
-            unit_info = f"{unit.nom} (Ennemi): PV={unit.health}, Bouclier={unit.defense_shield}"
+            unit_info = f" - {unit.nom} (Ennemi): PV = {unit.health}, Bouclier = {unit.defense_shield}"
             unit_surface = font.render(unit_info, True, white)
             self.screen.blit(unit_surface, (x_offset, y_offset))
-            y_offset += 30
-
-        # Instructions
-        instructions = [
-            "Déplacer: flèches",
-            "Attaquer: espace"]
-        y_offset += 20
-        for instruction in instructions:
-            instruction_surface = font.render(instruction, True, white)
-            self.screen.blit(instruction_surface, (x_offset, y_offset))
-            y_offset += 30
+            y_offset += 20
         
 
     def handle_player_turn(self):
@@ -85,7 +80,7 @@ class Game:
 
                 # Affichage du joueur
                 # Police et position pour le texte
-                font = pygame.font.Font(None, 30)
+                font = pygame.font.Font(None, 40)
                 white = (255, 255, 255)
                 y_offset = 10
                 x_offset = 600
@@ -95,12 +90,65 @@ class Game:
                 # Mettre à jour l'affichage
                 pygame.display.flip()
 
-                # Si l'unité est un mage, il récupère 1 point de mana par tour
+                # Si l'unité est un mage, il récupère 1 point de mana par tour et peut jouer une compétence
                 if isinstance(selected_unit,Mage):
                     selected_unit.mana += 1
 
-                # Important: cette boucle permet de gérer les événements Pygame
+                    font = pygame.font.Font(None, 40)
+                    white = (255, 255, 255)
+                    y_offset = 100
+                    x_offset = 500
+                    unit_status = ["Déplacement avec les touches du clavier",
+                                    "",
+                                    " - Attaquer au corps à corps: tapez 1",
+                                    " - Soigner: tapez 2",
+                                    " - Ne rien faire: tapez 3"]
+                    for unit_status in unit_status:
+                        unit_surface = font.render(unit_status, True, white)
+                        self.screen.blit(unit_surface, (x_offset, y_offset))
+                        y_offset += 30
+                
+                # Si l'unité est un voleur
+                elif isinstance(selected_unit,Voleur):
+                    selected_unit.is_invisble = False
+                    font = pygame.font.Font(None, 40)
+                    white = (255, 255, 255)
+                    y_offset = 100
+                    x_offset = 500
+                    unit_status = ["Déplacement avec les touches du clavier",
+                                    "",
+                                    "Compétences:",
+                                    " - Attaquer au corps à corps: tapez 1",
+                                    " - Se rendre invisible: tapez 2",
+                                    " - Ne rien faire: tapez 3"]
+                    for unit_status in unit_status:
+                        unit_surface = font.render(unit_status, True, white)
+                        self.screen.blit(unit_surface, (x_offset, y_offset))
+                        y_offset += 30
+
+                elif isinstance(selected_unit,Guerrier):
+                    font = pygame.font.Font(None, 40)
+                    white = (255, 255, 255)
+                    y_offset = 100
+                    x_offset = 500
+                    unit_status = ["Déplacement avec les touches du clavier",
+                                    "",
+                                    "Compétences:",
+                                    " - Attaquer au corps à corps: tapez 1",
+                                    " - Tirez à l'arc: tapez 2",
+                                    " - Ne rien faire: tapez 3"]
+                    for unit_status in unit_status:
+                        unit_surface = font.render(unit_status, True, white)
+                        self.screen.blit(unit_surface, (x_offset, y_offset))
+                        y_offset += 30
+                
+                # Mettre à jour l'affichage
+                pygame.display.flip()
+
                 for event in pygame.event.get():
+                    attack = False
+                    special_skill = False
+                    no_action = False
 
                     # Gestion de la fermeture de la fenêtre
                     if event.type == pygame.QUIT:
@@ -120,18 +168,43 @@ class Game:
                             dy = -1
                         elif event.key == pygame.K_DOWN:
                             dy = 1
+                        elif event.key == pygame.K_1:
+                            attack = True
+                        elif event.key == pygame.K_2:
+                            special_skill = True
+                        elif event.key == pygame.K_3:
+                            no_action = True
 
                         selected_unit.move(dx, dy)
                         self.flip_display()
 
-                        # Attaque (touche espace) met fin au tour
-                        if event.key == pygame.K_SPACE:
-                            for enemy in self.enemy_units:
-                                selected_unit.attack(enemy)
+                    
+                    if attack:
+                    #Sélection d'une cible (à coder)
 
-                            has_acted = True
-                            selected_unit.is_selected = False
+                        # Important: cette boucle permet de gérer les événements Pygame
+                        if isinstance(target,Voleur): #Vérification si la cible n'est pas invisible
+                            while target.is_invisible:
+                                font = pygame.font.Font(None, 40)
+                                white = (255, 255, 255)
+                                y_offset = 10
+                                x_offset = 600
+                                unit_status = f"Impossible ! Cette unité est invisible !"
+                                unit_surface = font.render(unit_status, True, white)
+                                self.screen.blit(unit_surface, (x_offset, y_offset))
+                                # Mettre à jour l'affichage
+                                pygame.display.flip()
+
+                        has_acted = True
+                        selected_unit.is_selected = False
                         
+                    if special_skill:
+                        has_acted = True
+                        selected_unit.is_selected = False
+
+                    if no_action:
+                        has_acted = True
+                        selected_unit.is_selected = False
 
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
@@ -178,7 +251,7 @@ def main():
     pygame.init()
 
     # Instanciation de la fenêtre
-    screen = pygame.display.set_mode((1200, 480))
+    screen = pygame.display.set_mode((1100, 480))
     pygame.display.set_caption("Mon jeu de stratégie")
 
     # Instanciation du jeu
