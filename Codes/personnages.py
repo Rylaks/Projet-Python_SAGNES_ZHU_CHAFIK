@@ -23,7 +23,7 @@ class Mage(Unit,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers e
     def __init__(self,x ,y, team):
         Unit.__init__(self,x,y,team)
         self.health = 10
-        self.mana = 3
+        self.mana = 10
         self.attack_power = 8
         self.defense_shield = 3
         self.speed = 3
@@ -34,19 +34,23 @@ class Mage(Unit,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers e
         else:
             raise TypeError ("La team doit être - player - ou - enemy - !")
         
-    image1 = pygame.image.load("images/gandalf.png")
-    image1 = pygame.transform.scale(image1, (CELL_SIZE, CELL_SIZE))
-    image2 = pygame.image.load("images/saroumane.png")
-    image2 = pygame.transform.scale(image2, (CELL_SIZE, CELL_SIZE))
-        
+        # Charger les images
+        self.image = pygame.image.load(
+            "images/gandalf.png" if team == "player" else "images/saroumane.png"
+        )
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
+
     def draw(self, screen):
-        """Affiche l'unité sur l'écran."""
-        color = BLUE if self.team == 'player' else RED
+        """Affiche l'unité sur l'écran avec une image."""
         if self.is_selected:
-            pygame.draw.rect(screen, WHITE, (self.x * CELL_SIZE,
-                            self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-        pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
-                            2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+            # Ajouter une bordure blanche si l'unité est sélectionnée
+            pygame.draw.rect(
+                screen, WHITE,
+                (self.x * CELL_SIZE, self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE),
+                2  # Épaisseur de la bordure
+            )
+        # Dessiner l'image correspondant à l'unité
+        screen.blit(self.image, (self.x * CELL_SIZE, self.y * CELL_SIZE))
     
 
 class Voleur(Unit,Skills):    #Voleur: vitesse grande, attaque faible, boucliers et vie moyennes
@@ -82,19 +86,23 @@ class Voleur(Unit,Skills):    #Voleur: vitesse grande, attaque faible, boucliers
         else:
             raise TypeError ("La team doit être - player - ou - enemy - !")
         
-    image1 = pygame.image.load("images/Bilbon.png")
-    image1 = pygame.transform.scale(image1, (CELL_SIZE, CELL_SIZE))
-    image2 = pygame.image.load("images/gollum.png")
-    image2 = pygame.transform.scale(image2, (CELL_SIZE, CELL_SIZE))
-        
+# Charger les images
+        self.image = pygame.image.load(
+            "images/bilbon.png" if team == "player" else "images/gollum.png"
+        )
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
+
     def draw(self, screen):
-        """Affiche l'unité sur l'écran."""
-        color = BLUE if self.team == 'player' else RED
+        """Affiche l'unité sur l'écran avec une image."""
         if self.is_selected:
-            pygame.draw.rect(screen, WHITE, (self.x * CELL_SIZE,
-                            self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-        pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
-                            2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+            # Ajouter une bordure blanche si l'unité est sélectionnée
+            pygame.draw.rect(
+                screen, WHITE,
+                (self.x * CELL_SIZE, self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE),
+                2  # Épaisseur de la bordure
+            )
+        # Dessiner l'image correspondant à l'unité
+        screen.blit(self.image, (self.x * CELL_SIZE, self.y * CELL_SIZE))
 
     
 class Guerrier(Unit,Skills):    #Guerrier: vitesse faible, attaque grandes, boucliers et vie importants
@@ -129,16 +137,20 @@ class Guerrier(Unit,Skills):    #Guerrier: vitesse faible, attaque grandes, bouc
         else:
             raise TypeError ("La team doit être - player - ou - enemy - !")
         
-    image1 = pygame.image.load("images/aragorn.png")
-    image1 = pygame.transform.scale(image1, (CELL_SIZE, CELL_SIZE))
-    image2 = pygame.image.load("images/Angmar.png")
-    image2 = pygame.transform.scale(image2, (CELL_SIZE, CELL_SIZE))
-        
+    # Charger les images
+        self.image = pygame.image.load(
+            "images/aragorn.png" if team == "player" else "images/Angmar.png"
+        )
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
+
     def draw(self, screen):
-        """Affiche l'unité sur l'écran."""
-        color = BLUE if self.team == 'player' else RED
+        """Affiche l'unité sur l'écran avec une image."""
         if self.is_selected:
-            pygame.draw.rect(screen, WHITE, (self.x * CELL_SIZE,
-                            self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-        pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
-                            2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+            # Ajouter une bordure blanche si l'unité est sélectionnée
+            pygame.draw.rect(
+                screen, WHITE,
+                (self.x * CELL_SIZE, self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE),
+                2  # Épaisseur de la bordure
+            )
+        # Dessiner l'image correspondant à l'unité
+        screen.blit(self.image, (self.x * CELL_SIZE, self.y * CELL_SIZE))

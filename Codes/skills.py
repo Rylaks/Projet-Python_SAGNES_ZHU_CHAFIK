@@ -13,7 +13,7 @@ class Skills:
     #pour les mages:
     def heal(self,target,value):
         """Soigne les points de vie d'une unité alliée à portée, et utilise du mana"""
-        if self.mana < value and target.team == "player":
+        if self.mana > value and target.team == "player":
             target.health += value
             self.mana -= value
         else:

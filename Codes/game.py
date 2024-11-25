@@ -52,7 +52,7 @@ class Game:
 
         # Afficher les informations des unités (joueur)
         y_offset = 300
-        x_offset = 490
+        x_offset = CELL_SIZE * GRID_SIZE + 100
         unit_info = f"Statistiques:"
         unit_surface = font.render(unit_info, True, white)
         self.screen.blit(unit_surface, (x_offset, y_offset))
@@ -87,7 +87,7 @@ class Game:
                 font = pygame.font.Font(None, 40)
                 white = (255, 255, 255)
                 y_offset = 10
-                x_offset = 550
+                x_offset = CELL_SIZE * GRID_SIZE + 100
                 unit_status = f"C'est à {selected_unit.nom} de jouer !"
                 unit_surface = font.render(unit_status, True, white)
                 self.screen.blit(unit_surface, (x_offset, y_offset))
@@ -101,7 +101,7 @@ class Game:
                     font = pygame.font.Font(None, 40)
                     white = (255, 255, 255)
                     y_offset = 100
-                    x_offset = 500
+                    x_offset = CELL_SIZE * GRID_SIZE + 50
                     unit_status = ["Déplacement avec les touches du clavier",
                                     "",
                                     " - Attaquer au corps à corps: tapez 1",
@@ -118,7 +118,7 @@ class Game:
                     font = pygame.font.Font(None, 40)
                     white = (255, 255, 255)
                     y_offset = 100
-                    x_offset = 500
+                    x_offset = CELL_SIZE * GRID_SIZE + 50
                     unit_status = ["Déplacement avec les touches du clavier",
                                     "",
                                     "Compétences:",
@@ -134,7 +134,7 @@ class Game:
                     font = pygame.font.Font(None, 40)
                     white = (255, 255, 255)
                     y_offset = 100
-                    x_offset = 500
+                    x_offset = CELL_SIZE * GRID_SIZE + 50
                     unit_status = ["Déplacement avec les touches du clavier",
                                     "",
                                     "Compétences:",
@@ -226,7 +226,7 @@ class Game:
                             red = (255, 0, 0)
                             error_msg = "Aucune cible valide à cet endroit !"
                             error_surface = font.render(error_msg, True, red)
-                            self.screen.blit(error_surface, (500, 100))
+                            self.screen.blit(error_surface, (CELL_SIZE * GRID_SIZE + 100, 100))
                             pygame.display.flip()
                             pygame.time.wait(1000)  # Pause pour que le joueur voie le message
 
@@ -236,7 +236,7 @@ class Game:
                                     red = (255, 0, 0)
                                     error_msg = "Cette unité porte l'anneau et est invisible ! Impossible !"
                                     error_surface = font.render(error_msg, True, red)
-                                    self.screen.blit(error_surface, (500, 100))
+                                    self.screen.blit(error_surface, (CELL_SIZE * GRID_SIZE + 100, 100))
                                     pygame.display.flip()
                                     pygame.time.wait(1000)  # Pause pour que le joueur voie le message
 
@@ -301,13 +301,12 @@ class Game:
         if self.point_aff:
             pygame.draw.rect(self.screen, GREEN, (self.point.x * CELL_SIZE,
                             self.point.y * CELL_SIZE, CELL_SIZE, CELL_SIZE),width=5)
-            font = pygame.font.Font(None, 40)
+            font = pygame.font.Font(None, 30)
             red = (255, 0, 0)
-            info = ["Choisir une cible avec","les touches directionnelles"]
-            for i, info in enumerate(info):
-                info_surface = font.render(info, True, WHITE)
-                self.screen.blit(info_surface, (500, 10 + i*30))
-                pygame.display.flip()
+            info = "Choisir une cible avec les touches directionnelles"
+            info_surface = font.render(info, True, WHITE)
+            self.screen.blit(info_surface, (CELL_SIZE * GRID_SIZE + 100, 10))
+            pygame.display.flip()
 
         # Affiche le HUD
         self.draw_hud()
@@ -316,9 +315,9 @@ class Game:
         if len(self.enemy_units) == 0:
             font = pygame.font.Font(None, 40)
             white = (255, 255, 255)
-            y_offset = 10
-            x_offset = 600
-            unit_status = f"Bravo ! La Communauté de l'anneau a vaincu Sauron"
+            y_offset = CELL_SIZE * GRID_SIZE + 100
+            x_offset = CELL_SIZE * GRID_SIZE + 100
+            unit_status = f"Bravo ! La Communauté de l'anneau a vaincu Sauron !"
             unit_surface = font.render(unit_status, True, white)
             self.screen.blit(unit_surface, (x_offset, y_offset))
 
@@ -332,11 +331,55 @@ def main():
     # Initialisation de Pygame
     pygame.init()
 
+    #Initialisation de la musique
+    pygame.mixer.init()
+    pygame.mixer.music.load("music\The_Bridge_of_Khazad_Dum.mp3")
+    pygame.mixer.music.play(-1)  # Joue en boucle infinie
+
     # Instanciation de la fenêtre
-    screen = pygame.display.set_mode((1100, 600))
+    screen = pygame.display.set_mode((1300, 800))
     pygame.display.set_caption("Mon jeu de stratégie")
 
-    # Instanciation du jeu
+    # Écran titre
+    image = pygame.image.load("images\conte.jpg")
+    # Initialiser une police pour le texte
+    font = pygame.font.Font(None, 50)  # Police par défaut, taille 50
+    text = font.render("Appuyez sur SPACE pour lancer le jeu", True, BLACK)  # Texte blanc
+
+    # Obtenir la position centrale de l'image
+    image_rect = image.get_rect(center=(700, 500))  # Centré à (400, 300)
+
+    # Positionner le texte (centré sur l'image)
+    text_rect = text.get_rect(center=(950,100))
+
+    running = True
+    while running:
+        # Gestion des événements
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    running = False
+
+        # Remplir l'écran avec une couleur unie (optionnel)
+        screen.fill((0, 0, 0))  # Fond noir
+
+        # Dessiner l'image sur l'écran
+        screen.blit(image, image_rect)
+
+        # Dessiner le texte sur l'écran
+        screen.blit(text, text_rect)
+
+        # Mettre à jour l'affichage
+        pygame.display.flip()
+
+    # Quitter Pygame proprement
+    pygame.mixer.music.stop()
+    pygame.quit()
+
+    # Initialisation de Pygame
+    screen = pygame.display.set_mode((1300, 700))
+    pygame.display.set_caption("Mon jeu de stratégie")
+    pygame.init()
     game = Game(screen)
 
     # Boucle principale du jeu

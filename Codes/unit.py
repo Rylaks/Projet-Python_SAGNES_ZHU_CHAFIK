@@ -3,7 +3,7 @@ import random
 
 # Constantes
 GRID_SIZE = 8
-CELL_SIZE = 60
+CELL_SIZE = 80
 WIDTH = GRID_SIZE * CELL_SIZE
 HEIGHT = GRID_SIZE * CELL_SIZE
 FPS = 30
