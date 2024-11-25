@@ -43,7 +43,7 @@ class Mage(Unit,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers e
         """Affiche l'unité sur l'écran."""
         color = BLUE if self.team == 'player' else RED
         if self.is_selected:
-            pygame.draw.rect(screen, GREEN, (self.x * CELL_SIZE,
+            pygame.draw.rect(screen, WHITE, (self.x * CELL_SIZE,
                             self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
         pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
                             2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
@@ -91,10 +91,11 @@ class Voleur(Unit,Skills):    #Voleur: vitesse grande, attaque faible, boucliers
         """Affiche l'unité sur l'écran."""
         color = BLUE if self.team == 'player' else RED
         if self.is_selected:
-            pygame.draw.rect(screen, GREEN, (self.x * CELL_SIZE,
+            pygame.draw.rect(screen, WHITE, (self.x * CELL_SIZE,
                             self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
         pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
-                           2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+                            2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
+
     
 class Guerrier(Unit,Skills):    #Guerrier: vitesse faible, attaque grandes, boucliers et vie importants
     """
@@ -137,7 +138,7 @@ class Guerrier(Unit,Skills):    #Guerrier: vitesse faible, attaque grandes, bouc
         """Affiche l'unité sur l'écran."""
         color = BLUE if self.team == 'player' else RED
         if self.is_selected:
-            pygame.draw.rect(screen, GREEN, (self.x * CELL_SIZE,
+            pygame.draw.rect(screen, WHITE, (self.x * CELL_SIZE,
                             self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
         pygame.draw.circle(screen, color, (self.x * CELL_SIZE + CELL_SIZE //
                             2, self.y * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)

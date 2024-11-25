@@ -4,6 +4,7 @@ import random
 from unit import *
 from personnages import *
 from skills import *
+from pointeur import *
 
 class Game:
     """
@@ -37,6 +38,9 @@ class Game:
         self.enemy_units = [Mage(7, 7, 'enemy'), 
                             Voleur(7, 6, 'enemy'),
                             Guerrier(6, 7, 'enemy')]
+        
+        self.point = Pointer(0,0)
+        self.point_aff = False
         
         
     def draw_hud(self):
@@ -83,14 +87,14 @@ class Game:
                 font = pygame.font.Font(None, 40)
                 white = (255, 255, 255)
                 y_offset = 10
-                x_offset = 600
+                x_offset = 550
                 unit_status = f"C'est à {selected_unit.nom} de jouer !"
                 unit_surface = font.render(unit_status, True, white)
                 self.screen.blit(unit_surface, (x_offset, y_offset))
                 # Mettre à jour l'affichage
                 pygame.display.flip()
 
-                # Si l'unité est un mage, il récupère 1 point de mana par tour et peut jouer une compétence
+                # Si l'unité est un mage, il récupère 1 point de mana par tour
                 if isinstance(selected_unit,Mage):
                     selected_unit.mana += 1
 
@@ -101,7 +105,7 @@ class Game:
                     unit_status = ["Déplacement avec les touches du clavier",
                                     "",
                                     " - Attaquer au corps à corps: tapez 1",
-                                    " - Soigner: tapez 2",
+                                    " - Soigner: tapez 2", #afficher le nombre de mana
                                     " - Ne rien faire: tapez 3"]
                     for unit_status in unit_status:
                         unit_surface = font.render(unit_status, True, white)
@@ -178,33 +182,89 @@ class Game:
                         selected_unit.move(dx, dy)
                         self.flip_display()
 
-                    
+                    #Sélection d'une cible
+                    if special_skill and not isinstance(selected_unit,Voleur):
+                        self.point_aff = True
+                        choose = False
+                        self.point.x, self.point.y = selected_unit.x, selected_unit.y  # Centrez le pointeur sur l'unité
+                        self.flip_display() #affichage du pointeur
+                        target = None
+                        while not choose and target is None:
+                            for event in pygame.event.get():
+
+                                if event.type == pygame.KEYDOWN:
+                                    dx, dy = 0, 0
+                                    if event.key == pygame.K_LEFT:
+                                        dx = -1
+                                    elif event.key == pygame.K_RIGHT:
+                                        dx = 1
+                                    elif event.key == pygame.K_UP:
+                                        dy = -1
+                                    elif event.key == pygame.K_DOWN:
+                                        dy = 1
+                                    elif event.key == pygame.K_SPACE:
+                                        choose = True  # Valide la cible
+
+                                    # Déplace le pointeur
+                                    self.point.move(dx, dy)
+                                    self.flip_display()
+
+                        self.point_aff = False
+
+                        for enemy in self.enemy_units:
+                            for unit in self.player_units:
+                                if (enemy.x == self.point.x and enemy.y == self.point.y):
+                                    target = enemy
+                                    break  # Trouvé la cible
+                                if (unit.x == self.point.x and unit.y == self.point.y):
+                                    target = unit
+                                    break  # Trouvé la cible
+
+                        if target is None:
+                            # Affiche un message d'erreur si aucune cible n'est trouvée
+                            font = pygame.font.Font(None, 40)
+                            red = (255, 0, 0)
+                            error_msg = "Aucune cible valide à cet endroit !"
+                            error_surface = font.render(error_msg, True, red)
+                            self.screen.blit(error_surface, (500, 100))
+                            pygame.display.flip()
+                            pygame.time.wait(1000)  # Pause pour que le joueur voie le message
+
+                            if isinstance(target,Voleur): # Vérification si la cible n'est pas invisible
+                                if target.set_invisible:
+                                    font = pygame.font.Font(None, 40)
+                                    red = (255, 0, 0)
+                                    error_msg = "Cette unité porte l'anneau et est invisible ! Impossible !"
+                                    error_surface = font.render(error_msg, True, red)
+                                    self.screen.blit(error_surface, (500, 100))
+                                    pygame.display.flip()
+                                    pygame.time.wait(1000)  # Pause pour que le joueur voie le message
+
+                                    target = None
+                        
                     if attack:
-                    #Sélection d'une cible (à coder)
-
-                        # Important: cette boucle permet de gérer les événements Pygame
-                        if isinstance(target,Voleur): #Vérification si la cible n'est pas invisible
-                            while target.is_invisible:
-                                font = pygame.font.Font(None, 40)
-                                white = (255, 255, 255)
-                                y_offset = 10
-                                x_offset = 600
-                                unit_status = f"Impossible ! Cette unité est invisible !"
-                                unit_surface = font.render(unit_status, True, white)
-                                self.screen.blit(unit_surface, (x_offset, y_offset))
-                                # Mettre à jour l'affichage
-                                pygame.display.flip()
-
+                        for enemy in self.enemy_units:
+                            selected_unit.attack(enemy)
                         has_acted = True
                         selected_unit.is_selected = False
                         
                     if special_skill:
+                        if isinstance(selected_unit,Voleur):
+                            selected_unit.invisibility()
+                        if isinstance(selected_unit,Guerrier):
+                            selected_unit.bow(target)
+                        if isinstance(selected_unit,Mage):
+                            selected_unit.heal(target,5) #à coder: pouvoir choisir la valeur
                         has_acted = True
                         selected_unit.is_selected = False
 
                     if no_action:
                         has_acted = True
                         selected_unit.is_selected = False
+
+                    for enemy in self.enemy_units:
+                        if enemy.health <= 0:
+                            self.enemy_units.remove(enemy)
 
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
@@ -237,8 +297,30 @@ class Game:
         for unit in self.player_units + self.enemy_units:
             unit.draw(self.screen)
 
+        # Affiche le pointeur
+        if self.point_aff:
+            pygame.draw.rect(self.screen, GREEN, (self.point.x * CELL_SIZE,
+                            self.point.y * CELL_SIZE, CELL_SIZE, CELL_SIZE),width=5)
+            font = pygame.font.Font(None, 40)
+            red = (255, 0, 0)
+            info = ["Choisir une cible avec","les touches directionnelles"]
+            for i, info in enumerate(info):
+                info_surface = font.render(info, True, WHITE)
+                self.screen.blit(info_surface, (500, 10 + i*30))
+                pygame.display.flip()
+
         # Affiche le HUD
         self.draw_hud()
+
+        # Afficher la victoire (à coder, ça ne marche pas)
+        if len(self.enemy_units) == 0:
+            font = pygame.font.Font(None, 40)
+            white = (255, 255, 255)
+            y_offset = 10
+            x_offset = 600
+            unit_status = f"Bravo ! La Communauté de l'anneau a vaincu Sauron"
+            unit_surface = font.render(unit_status, True, white)
+            self.screen.blit(unit_surface, (x_offset, y_offset))
 
         # Rafraîchit l'écran
         pygame.display.flip()
@@ -251,7 +333,7 @@ def main():
     pygame.init()
 
     # Instanciation de la fenêtre
-    screen = pygame.display.set_mode((1100, 480))
+    screen = pygame.display.set_mode((1100, 600))
     pygame.display.set_caption("Mon jeu de stratégie")
 
     # Instanciation du jeu
