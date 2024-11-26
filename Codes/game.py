@@ -6,6 +6,34 @@ from personnages import *
 from skills import *
 from pointeur import *
 
+from diff_case import Bush, Rock,Water,Terrain
+
+class GameBoard:
+    def __init__(self, size):
+        self.size = size
+        self.grid = [[Terrain() for _ in range(size)] for _ in range(size)]
+        
+        # 随机设置草丛地形
+        num_bushes = random.randint(1, 5)  # 假设有1到5个草丛
+        for _ in range(num_bushes):
+            x, y = random.randint(0, size - 1), random.randint(0, size - 1)
+            self.grid[x][y] = Bush()
+
+
+        # 随机设置岩石地形
+        num_rocks = random.randint(1, 5)  # 假设有1到5个岩石
+        for _ in range(num_rocks):
+            x, y = random.randint(0, size - 1), random.randint(0, size - 1)
+            self.grid[x][y] = Rock()
+
+
+
+        # 随机设置水地形
+        num_waters = random.randint(1, 5)  # 假设有1到5个水地形
+        for _ in range(num_waters):
+            x, y = random.randint(0, size - 1), random.randint(0, size - 1)
+            self.grid[x][y] = Water()
+
 class Game:
     """
     Classe pour représenter le jeu.
@@ -21,7 +49,7 @@ class Game:
         La liste des unités de l'adversaire.
     """
 
-    def __init__(self, screen):
+    def __init__(self, screen,board_size):
         """
         Construit le jeu avec la surface de la fenêtre.
 
@@ -31,6 +59,7 @@ class Game:
             La surface de la fenêtre du jeu.
         """
         self.screen = screen
+        self.board = GameBoard(board_size)
         self.player_units = [Mage(0, 0, 'player'),
                              Voleur(1, 0, 'player'),
                              Guerrier(0, 1, 'player')]
@@ -323,6 +352,9 @@ class Game:
 
         # Rafraîchit l'écran
         pygame.display.flip()
+
+    
+
 
 
 
