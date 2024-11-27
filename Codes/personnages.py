@@ -139,7 +139,7 @@ class Guerrier(Unit,Skills):    #Guerrier: vitesse faible, attaque grandes, bouc
         
     # Charger les images
         self.image = pygame.image.load(
-            "images/aragorn.png" if team == "player" else "images/Angmar.png"
+            "images/aragorn.jpg" if team == "player" else "images/Angmar.png"
         )
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
 

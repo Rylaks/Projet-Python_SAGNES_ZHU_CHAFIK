@@ -49,7 +49,7 @@ class Game:
         La liste des unités de l'adversaire.
     """
 
-    def __init__(self, screen,board_size):
+    def __init__(self, screen):
         """
         Construit le jeu avec la surface de la fenêtre.
 
@@ -59,16 +59,16 @@ class Game:
             La surface de la fenêtre du jeu.
         """
         self.screen = screen
-        self.board = GameBoard(board_size)
+        #self.board = GameBoard(board_size)
         self.player_units = [Mage(0, 0, 'player'),
-                             Voleur(1, 0, 'player'),
-                             Guerrier(0, 1, 'player')]
+                             Voleur(2, 0, 'player'),
+                             Guerrier(0, 2, 'player')]
 
         self.enemy_units = [Mage(7, 7, 'enemy'), 
-                            Voleur(7, 6, 'enemy'),
-                            Guerrier(6, 7, 'enemy')]
+                            Voleur(7, 5, 'enemy'),
+                            Guerrier(5, 7, 'enemy')]
         
-        self.point = Pointer(0,0)
+        self.point = Pointeur(0,0)
         self.point_aff = False
         
         
@@ -133,9 +133,10 @@ class Game:
                     x_offset = CELL_SIZE * GRID_SIZE + 50
                     unit_status = ["Déplacement avec les touches du clavier",
                                     "",
-                                    " - Attaquer au corps à corps: tapez 1",
-                                    " - Soigner: tapez 2", #afficher le nombre de mana
-                                    " - Ne rien faire: tapez 3"]
+                                    " - Ne rien faire: tapez 1",
+                                    " - Attaquer au corps à corps: tapez 2",  #afficher le nombre de mana
+                                    " - Soigner: tapez 3",
+                                    " - Boule de feu: tapez 4"]
                     for unit_status in unit_status:
                         unit_surface = font.render(unit_status, True, white)
                         self.screen.blit(unit_surface, (x_offset, y_offset))
@@ -151,9 +152,9 @@ class Game:
                     unit_status = ["Déplacement avec les touches du clavier",
                                     "",
                                     "Compétences:",
-                                    " - Attaquer au corps à corps: tapez 1",
-                                    " - Se rendre invisible: tapez 2",
-                                    " - Ne rien faire: tapez 3"]
+                                    " - Ne rien faire: tapez 1",
+                                    " - Attaquer au corps à corps: tapez 2",
+                                    " - Se rendre invisible: tapez 3"]
                     for unit_status in unit_status:
                         unit_surface = font.render(unit_status, True, white)
                         self.screen.blit(unit_surface, (x_offset, y_offset))
@@ -167,9 +168,9 @@ class Game:
                     unit_status = ["Déplacement avec les touches du clavier",
                                     "",
                                     "Compétences:",
-                                    " - Attaquer au corps à corps: tapez 1",
-                                    " - Tirez à l'arc: tapez 2",
-                                    " - Ne rien faire: tapez 3"]
+                                    " - Ne rien faire: tapez 1",
+                                    " - Attaquer au corps à corps: tapez 2",
+                                    " - Tirer à l'arc: tapez 3"]
                     for unit_status in unit_status:
                         unit_surface = font.render(unit_status, True, white)
                         self.screen.blit(unit_surface, (x_offset, y_offset))
@@ -181,6 +182,7 @@ class Game:
                 for event in pygame.event.get():
                     attack = False
                     special_skill = False
+                    special_skill_2 = False
                     no_action = False
 
                     # Gestion de la fermeture de la fenêtre
@@ -202,14 +204,27 @@ class Game:
                         elif event.key == pygame.K_DOWN:
                             dy = 1
                         elif event.key == pygame.K_1:
-                            attack = True
-                        elif event.key == pygame.K_2:
-                            special_skill = True
-                        elif event.key == pygame.K_3:
                             no_action = True
+                        elif event.key == pygame.K_2:
+                            attack = True
+                        elif event.key == pygame.K_3:
+                            special_skill = True
+                        elif event.key == pygame.K_4:
+                            special_skill_2 = True
 
-                        selected_unit.move(dx, dy)
-                        self.flip_display()
+                        #éviter qu'une unité puisse aller sur une case déjà occupée
+                        occupied = False
+                        for k in self.player_units:
+                            if k != selected_unit and selected_unit.x + dx == k.x and selected_unit.y + dy == k.y:
+                                occupied = True
+                                break
+                        for k in self.enemy_units:
+                            if k != selected_unit and selected_unit.x + dx == k.x and selected_unit.y + dy == k.y:
+                                occupied = True
+                                break
+                        if not occupied:
+                            selected_unit.move(dx, dy)
+                            self.flip_display()
 
                     #Sélection d'une cible
                     if special_skill and not isinstance(selected_unit,Voleur):
@@ -259,17 +274,17 @@ class Game:
                             pygame.display.flip()
                             pygame.time.wait(1000)  # Pause pour que le joueur voie le message
 
-                            if isinstance(target,Voleur): # Vérification si la cible n'est pas invisible
-                                if target.set_invisible:
-                                    font = pygame.font.Font(None, 40)
-                                    red = (255, 0, 0)
-                                    error_msg = "Cette unité porte l'anneau et est invisible ! Impossible !"
-                                    error_surface = font.render(error_msg, True, red)
-                                    self.screen.blit(error_surface, (CELL_SIZE * GRID_SIZE + 100, 100))
-                                    pygame.display.flip()
-                                    pygame.time.wait(1000)  # Pause pour que le joueur voie le message
+                        if isinstance(target,Voleur): # Vérification si la cible n'est pas invisible
+                            if target.set_invisible:
+                                font = pygame.font.Font(None, 40)
+                                red = (255, 0, 0)
+                                error_msg = "Cette unité porte l'anneau et est invisible ! Impossible !"
+                                error_surface = font.render(error_msg, True, red)
+                                self.screen.blit(error_surface, (CELL_SIZE * GRID_SIZE + 100, 100))
+                                pygame.display.flip()
+                                pygame.time.wait(1000)  # Pause pour que le joueur voie le message
 
-                                    target = None
+                                target = None
                         
                     if attack:
                         for enemy in self.enemy_units:
@@ -298,11 +313,12 @@ class Game:
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
         for enemy in self.enemy_units:
-
+            occupied = False
             # Déplacement aléatoire
             target = random.choice(self.player_units)
             dx = 1 if enemy.x < target.x else -1 if enemy.x > target.x else 0
             dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
+                
             enemy.move(dx, dy)
 
             # Attaque si possible
@@ -343,11 +359,10 @@ class Game:
         # Afficher la victoire (à coder, ça ne marche pas)
         if len(self.enemy_units) == 0:
             font = pygame.font.Font(None, 40)
-            white = (255, 255, 255)
-            y_offset = CELL_SIZE * GRID_SIZE + 100
+            y_offset = CELL_SIZE * GRID_SIZE + 500
             x_offset = CELL_SIZE * GRID_SIZE + 100
             unit_status = f"Bravo ! La Communauté de l'anneau a vaincu Sauron !"
-            unit_surface = font.render(unit_status, True, white)
+            unit_surface = font.render(unit_status, True, RED)
             self.screen.blit(unit_surface, (x_offset, y_offset))
 
         # Rafraîchit l'écran

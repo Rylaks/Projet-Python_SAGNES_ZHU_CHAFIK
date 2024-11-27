@@ -54,10 +54,14 @@ class Unit:
         self.__is_selected = False
 
     def move(self, dx, dy):
+        if 0 <= self.__x + dx < GRID_SIZE and 0 <= self.__y + dy < GRID_SIZE:
+            self.__x += dx
+            self.__y += dy
+        """
         new_x = self.__x + dx
         new_y = self.__y + dy
         if 0 <= new_x < GRID_SIZE and 0 <= new_y < GRID_SIZE:
-            #mise a jour le type de terrain
+            mise a jour le type de terrain
             target_terrain = self.game.board.grid[new_y][new_x]
 
             # Check if the terrain allows movement
@@ -71,7 +75,7 @@ class Unit:
             
             # Indépendamment du mouvement, appeler les effets de l'immobilisation du terrain
             target_terrain.stay_effect(self)
-
+        """
 
     @property
     def x(self):

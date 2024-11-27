@@ -21,7 +21,7 @@ class Skills:
     
     def fire_ball(self,target):
         """Attaque à distance qui explose sur une zone d'effet importante"""
-        pass
+        
 
     #pour les voleurs:
     def invisibility(self):
