@@ -64,9 +64,9 @@ class Game:
                              Voleur(2, 0, 'player'),
                              Guerrier(0, 2, 'player')]
 
-        self.enemy_units = [Mage(7, 7, 'enemy'), 
-                            Voleur(7, 5, 'enemy'),
-                            Guerrier(5, 7, 'enemy')]
+        self.enemy_units = [Mage(GRID_SIZE - 1, GRID_SIZE - 1, 'enemy'), 
+                            Voleur(GRID_SIZE - 1, GRID_SIZE - 3, 'enemy'),
+                            Guerrier(GRID_SIZE - 3, GRID_SIZE - 1, 'enemy')]
         
         self.point = Pointeur(0,0)
         self.point_aff = False
@@ -79,7 +79,7 @@ class Game:
         font = pygame.font.Font(None, 25)
 
         # Afficher les informations des unités (joueur)
-        y_offset = 300
+        y_offset = CELL_SIZE * GRID_SIZE / 2
         x_offset = CELL_SIZE * GRID_SIZE + 100
         unit_info = f"Statistiques (joueur 1):"
         unit_surface = font.render(unit_info, True, WHITE)
@@ -408,7 +408,6 @@ class Game:
         # Rafraîchit l'écran
         pygame.display.flip()
 
-    
 
 
 
@@ -420,24 +419,29 @@ def main():
 
     #Initialisation de la musique
     pygame.mixer.init()
-    pygame.mixer.music.load("music\The_Bridge_of_Khazad_Dum.mp3")
+    pygame.mixer.music.load("music\The_Shire.mp3")
     pygame.mixer.music.play(-1)  # Joue en boucle infinie
 
     # Instanciation de la fenêtre
-    screen = pygame.display.set_mode((1300, 800))
+    screen = pygame.display.set_mode((1400, 900))
     pygame.display.set_caption("Mon jeu de stratégie")
 
     # Écran titre
     image = pygame.image.load("images\conte.jpg")
     # Initialiser une police pour le texte
-    font = pygame.font.Font(None, 50)  # Police par défaut, taille 50
-    text = font.render("Appuyez sur SPACE pour lancer le jeu", True, BLACK)  # Texte blanc
+    font = pygame.font.Font(None, 30)  # Police par défaut, taille 50
+    text1 = font.render("Appuyez sur SPACE pour lancer le jeu", True, BLACK)
+
+    font = pygame.font.Font(None, 60)  # Police par défaut, taille 50
+    text2 = font.render("Bienvenue dans la Comté !", True, BLACK) 
 
     # Obtenir la position centrale de l'image
-    image_rect = image.get_rect(center=(700, 500))  # Centré à (400, 300)
+    image_rect = image.get_rect(center=(700, 500))
 
-    # Positionner le texte (centré sur l'image)
-    text_rect = text.get_rect(center=(950,100))
+    # Positionner le texte
+    text_rect1 = text1.get_rect(center=(950,150))
+    # Positionner le texte
+    text_rect2 = text2.get_rect(center=(950,100))
 
     running = True
     while running:
@@ -454,7 +458,8 @@ def main():
         screen.blit(image, image_rect)
 
         # Dessiner le texte sur l'écran
-        screen.blit(text, text_rect)
+        screen.blit(text1, text_rect1)
+        screen.blit(text2, text_rect2)
 
         # Mettre à jour l'affichage
         pygame.display.flip()
@@ -463,10 +468,17 @@ def main():
     pygame.mixer.music.stop()
     pygame.quit()
 
+
     # Initialisation de Pygame
-    screen = pygame.display.set_mode((1300, 700))
+    screen = pygame.display.set_mode((GRID_SIZE * CELL_SIZE * 1.8, GRID_SIZE * CELL_SIZE))
     pygame.display.set_caption("Mon jeu de stratégie")
     pygame.init()
+
+    #Initialisation de la musique
+    pygame.mixer.init()
+    pygame.mixer.music.load("music\The_Battle_of_the_Pelennor_Fields.mp3")
+    pygame.mixer.music.play(-1)  # Joue en boucle infinie
+
     game = Game(screen)
 
     # Boucle principale du jeu
