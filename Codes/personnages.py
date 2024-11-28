@@ -22,8 +22,9 @@ class Mage(Unit,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers e
     """
     def __init__(self,x ,y, team):
         Unit.__init__(self,x,y,team)
+        Skills.__init__(self)
         self.health = 10
-        self.mana = 10
+        self.mana = 9 #commencera la partie avec 10 car en obtient 1 à chaque tour.
         self.attack_power = 8
         self.defense_shield = 3
         self.speed = 3
@@ -74,9 +75,10 @@ class Voleur(Unit,Skills):    #Voleur: vitesse grande, attaque faible, boucliers
     """
     def __init__(self,x ,y, team):
         Unit.__init__(self,x,y,team)
+        Skills.__init__(self)
         self.health = 10
         self.attack_power = 5
-        self.set_invisible = False
+        self.is_invisible = False
         self.defense_shield = 7
         self.speed = 5
         if team == "player":
@@ -126,6 +128,7 @@ class Guerrier(Unit,Skills):    #Guerrier: vitesse faible, attaque grandes, bouc
     """
     def __init__(self,x ,y, team):
         Unit.__init__(self,x,y,team)
+        Skills.__init__(self)
         self.health = 30
         self.attack_power = 10
         self.defense_shield = 10
