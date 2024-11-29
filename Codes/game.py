@@ -13,26 +13,32 @@ class GameBoard:
         self.size = size
         self.grid = [[Terrain() for _ in range(size)] for _ in range(size)]
         
-        # 随机设置草丛地形
-        num_bushes = random.randint(1, 5)  # 假设有1到5个草丛
+        # Terrain herbeux aléatoire
+        num_bushes = random.randint(1, 5)  # En supposant qu'il y ait un à cinq buissons
         for _ in range(num_bushes):
             x, y = random.randint(0, size - 1), random.randint(0, size - 1)
             self.grid[x][y] = Bush()
 
 
-        # 随机设置岩石地形
-        num_rocks = random.randint(1, 5)  # 假设有1到5个岩石
+        # Définir aléatoirement un terrain rocailleux
+        num_rocks = random.randint(1, 5)  # En supposant qu'il y ait un à cinq rochers
         for _ in range(num_rocks):
             x, y = random.randint(0, size - 1), random.randint(0, size - 1)
             self.grid[x][y] = Rock()
 
 
 
-        # 随机设置水地形
-        num_waters = random.randint(1, 5)  # 假设有1到5个水地形
+        # Terrain d'eau aléatoire
+        num_waters = random.randint(1, 5)  # Dans l'hypothèse d'un terrain d'eau de 1 à 5
         for _ in range(num_waters):
             x, y = random.randint(0, size - 1), random.randint(0, size - 1)
             self.grid[x][y] = Water()
+
+
+    def draw(self,screen):
+        for y in range(self.size):
+            for x in range(self.size):
+                self.grid[y][x].draw(screen,x,y) # Dessine chaque case
 
 class Game:
     """
@@ -372,8 +378,16 @@ class Game:
     def flip_display(self):
         """Affiche le jeu et le HUD."""
 
+
+
+        
+
         # Affiche la grille
         self.screen.fill(BLACK)
+
+        #Affiche les terrains depuis le gameBoard
+        self.board.draw(self.screen)
+
         for x in range(0, WIDTH, CELL_SIZE):
             for y in range(0, HEIGHT, CELL_SIZE):
                 rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
@@ -419,7 +433,7 @@ def main():
 
     #Initialisation de la musique
     pygame.mixer.init()
-    pygame.mixer.music.load("music\The_Shire.mp3")
+    pygame.mixer.music.load("music\The_Bridge_of_Khazad_Dum.mp3")
     pygame.mixer.music.play(-1)  # Joue en boucle infinie
 
     # Instanciation de la fenêtre
@@ -427,7 +441,7 @@ def main():
     pygame.display.set_caption("Mon jeu de stratégie")
 
     # Écran titre
-    image = pygame.image.load("images\conte.jpg")
+    image = pygame.image.load("images/conte.jpg") #use / instead of \
     # Initialiser une police pour le texte
     font = pygame.font.Font(None, 30)  # Police par défaut, taille 50
     text1 = font.render("Appuyez sur SPACE pour lancer le jeu", True, BLACK)
