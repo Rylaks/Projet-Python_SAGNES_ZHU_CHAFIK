@@ -1,15 +1,7 @@
-"""
-
-- Grass terrain ce terrain est visible, on peut savoir quelle grille est de l'herbe, ce que je veux implémenter c'est deux effets pour la grille d'herbe : 1. quand un personnage passe à travers cette grille : le personnage devient invisible et double sa vitesse ; 2. quand un personnage reste finalement dans cette grille, il ne devient pas invisible, le personnage est montré mais s'il reste plus de 2 rounds ou plus, sa valeur de vie sera +. 10.人物经过这个格子的时候：人物会变得不可见，并且速度会增加一倍；2. 人物最后停留在这个格子的时候，并不会隐身，会显示这个人物，但如果他停留超过2回合以上，生命值会+10
-
-- 1.un terrain rocailleux génère des rochers sur une case, alors tous les personnages sauf Guerrier ne peuvent pas traverser cette case, donc si le personnage avance de 4 cases, mais que la case 2 est rocailleuse, le personnage ne peut faire qu'un pas et s'arrêter sur la case avant la case rocailleuse. 2. pour Guerrier, il peut soit ignorer les rochers, soit les écraser, donc si le personnage est maintenant Guerrier, et qu'il veut avancer de 4 cases, il ne peut faire qu'un pas et s'arrêter sur la case avant la case rocailleuse. 3. pour Guerrier, il peut ignorer les rochers, soit les écraser. Si le personnage est un Guerrier et qu'il veut avancer de 4 cases, mais que la deuxième case est rocheuse, il peut détruire le rocher sur cette case, de sorte que cette case ne soit plus rocheuse, et il peut alors avancer de 4 cases comme d'habitude.. 对于Guerrier，他可以无视岩石，或者说他可以撞碎岩石，假如说人物现在是Guerrier，要前进四格，但第2格是岩石，他就可以毁掉这个格子的岩石，就这个格子不再是岩石了，然后他照样可以前进4格
-
-- Eau : le personnage sera ralenti de trente pour cent lors de son passage ; s'il reste sur cette grille pendant plus de deux tours, il perdra 10 points de sang.
-"""
 
 class Terrain:
     def __init__(self):
-        self.visible = True  # 是否影响单位可见性
+        self.visible = True  # visibilité
 
     def apply_effect(self, unit):
         """Appliquer l'effet du terrain à l'unité, implémenté dans les sous-classes"""
