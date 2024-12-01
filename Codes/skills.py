@@ -1,20 +1,20 @@
-    import random   #probabilité de coup critique et de précision
-    from unit import *
-    from portee import Portee
+import random   #probabilité de coup critique et de précision
+from unit import *
+from portee import Portee
     
-    class Skills:
+class Skills:
     
-        def __init__(self):
-            self.critique = False
-            self.miss = False
+     def __init__(self):
+        self.critique = False
+        self.miss = False
             
         # on defini ici la portee de chaque competence 
         
-            self.portees = {
-                 "attack": Portee(1, 1),  # Portée d'une case
-                 "heal": Portee(3, 3),   # Portée de 3 cases
-                 "fire_ball": Portee(5, 5),  # Portée de 5 cases
-                 "bow": Portee(10, 10)   # Portée de 10 cases
+        self.portees = {
+            "attack": Portee(1, 1),  # Portée d'une case
+            "heal": Portee(3, 3),   # Portée de 3 cases
+            "fire_ball": Portee(5, 5),  # Portée de 5 cases
+            "bow": Portee(10, 10)   # Portée de 10 cases
              }
          
      
@@ -67,7 +67,7 @@
                
                
                
-          def fire_ball(self,target):
+        def fire_ball(self,target):
             """Attaque à distance qui explose sur une zone d'effet importante"""
             pass
         

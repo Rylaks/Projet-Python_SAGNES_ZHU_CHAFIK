@@ -1,7 +1,17 @@
 
+import os
+import pygame
+from unit import CELL_SIZE
+from personnages import Guerrier
+
+
 class Terrain:
     def __init__(self):
         self.visible = True  # visibilité
+        
+         # Définit une image par défaut pour Terrain
+        self.image = pygame.Surface((CELL_SIZE, CELL_SIZE))  # Crée une surface de base
+        self.image.fill((100, 100, 100))  # Colore la surface en gris par défaut
 
     def apply_effect(self, unit):
         """Appliquer l'effet du terrain à l'unité, implémenté dans les sous-classes"""
@@ -19,7 +29,11 @@ class Bush(Terrain):
     def __init__(self):
         super().__init__()
         self.visible = True  # Le buisson est visible
-        self.image = pygame.image.load("images/bush.png")  # Charge l'image du buisson
+        
+        project_root = os.path.dirname(os.path.dirname(__file__))
+        image_path = os.path.join(project_root, "images", "bush.png")
+        
+        self.image = pygame.image.load(image_path)  # Charge l'image du buisson
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))# assurer qu l'image est le bon size
 
     def apply_effect(self, unit):
@@ -45,7 +59,12 @@ class Rock(Terrain):
     def __init__(self):
         super().__init__()
         self.passable = False  # Par défaut, le rocher est infranchissable
-        self.image = pygame.image.load("images/rock.png")  # Charge l'image du rocher
+        
+        # 动态构造图片路径
+        project_root = os.path.dirname(os.path.dirname(__file__))
+        image_path = os.path.join(project_root, "images", "rock.png")
+        
+        self.image = pygame.image.load(image_path)  # Charge l'image du rocher
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))# assurer qu l'image est le bon size
 
 
@@ -65,7 +84,12 @@ class Water(Terrain):
     def __init__(self):
         super().__init__()
         self.visible = True  # L'eau est visible
-        self.image = pygame.image.load("images/water.png")  # Charge l'image de l'eau
+        
+        # 动态构造图片路径
+        project_root = os.path.dirname(os.path.dirname(__file__))
+        image_path = os.path.join(project_root, "images", "water.png")
+        
+        self.image = pygame.image.load(image_path)  # Charge l'image de l'eau
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))# assurer qu l'image est le bon size
 
     def apply_effect(self, unit):

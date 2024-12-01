@@ -6,6 +6,7 @@ from personnages import *
 from skills import *
 from pointeur import *
 
+from unit import GRID_SIZE, CELL_SIZE, WIDTH, HEIGHT, WHITE, BLACK
 from diff_case import Bush, Rock,Water,Terrain
 
 class GameBoard:
@@ -14,14 +15,14 @@ class GameBoard:
         self.grid = [[Terrain() for _ in range(size)] for _ in range(size)]
         
         # Terrain herbeux aléatoire
-        num_bushes = random.randint(1, 5)  # En supposant qu'il y ait un à cinq buissons
+        num_bushes = random.randint(5, 10)  # En supposant qu'il y ait un à cinq buissons
         for _ in range(num_bushes):
             x, y = random.randint(0, size - 1), random.randint(0, size - 1)
             self.grid[x][y] = Bush()
 
 
         # Définir aléatoirement un terrain rocailleux
-        num_rocks = random.randint(1, 5)  # En supposant qu'il y ait un à cinq rochers
+        num_rocks = random.randint(3, 7)  # En supposant qu'il y ait un à cinq rochers
         for _ in range(num_rocks):
             x, y = random.randint(0, size - 1), random.randint(0, size - 1)
             self.grid[x][y] = Rock()
@@ -29,7 +30,7 @@ class GameBoard:
 
 
         # Terrain d'eau aléatoire
-        num_waters = random.randint(1, 5)  # Dans l'hypothèse d'un terrain d'eau de 1 à 5
+        num_waters = random.randint(4, 8)  # Dans l'hypothèse d'un terrain d'eau de 1 à 5
         for _ in range(num_waters):
             x, y = random.randint(0, size - 1), random.randint(0, size - 1)
             self.grid[x][y] = Water()
@@ -65,7 +66,7 @@ class Game:
             La surface de la fenêtre du jeu.
         """
         self.screen = screen
-        #self.board = GameBoard(board_size)
+        self.board = GameBoard(GRID_SIZE)
         self.player_units = [Mage(0, 0, 'player'),
                              Voleur(2, 0, 'player'),
                              Guerrier(0, 2, 'player')]
@@ -433,7 +434,7 @@ def main():
 
     #Initialisation de la musique
     pygame.mixer.init()
-    pygame.mixer.music.load("music\The_Bridge_of_Khazad_Dum.mp3")
+    pygame.mixer.music.load("music/The_Shire.mp3")
     pygame.mixer.music.play(-1)  # Joue en boucle infinie
 
     # Instanciation de la fenêtre
@@ -490,7 +491,7 @@ def main():
 
     #Initialisation de la musique
     pygame.mixer.init()
-    pygame.mixer.music.load("music\The_Battle_of_the_Pelennor_Fields.mp3")
+    pygame.mixer.music.load("music/The_Battle_of_the_Pelennor_Fields.mp3")
     pygame.mixer.music.play(-1)  # Joue en boucle infinie
 
     game = Game(screen)
