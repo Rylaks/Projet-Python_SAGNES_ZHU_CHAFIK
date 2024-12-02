@@ -64,13 +64,13 @@ class Game:
         """
         self.screen = screen
         #self.board = GameBoard(GRID_SIZE)
-        self.player_units = [Mage(0, 0, 'player',self),
-                             Voleur(2, 0, 'player',self),
-                             Guerrier(0, 2, 'player',self)]
+        self.player_units = [Mage(0, 0, 'player'),
+                             Voleur(2, 0, 'player'),
+                             Guerrier(0, 2, 'player')]
 
-        self.enemy_units = [Mage(GRID_SIZE - 1, GRID_SIZE - 1, 'enemy',self), 
-                            Voleur(GRID_SIZE - 1, GRID_SIZE - 3, 'enemy',self),
-                            Guerrier(GRID_SIZE - 3, GRID_SIZE - 1, 'enemy',self)]
+        self.enemy_units = [Mage(GRID_SIZE - 1, GRID_SIZE - 1, 'enemy'), 
+                            Voleur(GRID_SIZE - 1, GRID_SIZE - 3, 'enemy'),
+                            Guerrier(GRID_SIZE - 3, GRID_SIZE - 1, 'enemy')]
         
         self.point = Unit(0,0,"player")
         self.point_aff = False
@@ -124,22 +124,7 @@ class Game:
         """Tour du joueur"""
     
         for selected_unit in self.player_units:
-            self.player_units[0].is_selected = True
-            print("First unit selected:", self.player_units[0].is_selected)
-            
-            if selected_unit.is_selected:
-                
-                selected_unit.update_move_range()  # 确保调用此方法以计算移动范围
-                print("Updated move range:", selected_unit.green_cases)  # 打印出允许的移动范围
-                selected_unit.draw_move_range(self.screen) # 绘制移动范围
-                
-            
-            # 应用当前地形的停留效果
-            current_terrain = self.board.grid[selected_unit.y][selected_unit.x]
-            current_terrain.stay_effect(selected_unit)
-            
-            
-            
+    
             # Tant que l'unité n'a pas terminé son tour
             has_acted = False
             selected_unit.is_selected = True
@@ -502,14 +487,6 @@ class Game:
 
         # Affiche la grille
         self.screen.fill(BLACK)
-
-        #Affiche les terrains depuis le gameBoard
-        self.board.draw(self.screen)
-        
-        # 这里调用绘制移动范围，确保每次屏幕更新都能看到
-        for unit in self.player_units:
-            if unit.is_selected:
-                unit.draw_move_range(self.screen)
 
         for x in range(0, WIDTH, CELL_SIZE):
             for y in range(0, HEIGHT, CELL_SIZE):

@@ -36,7 +36,7 @@ class Unit:
         Dessine l'unité sur la grille.
     """
 
-    def __init__(self, x, y, team,game):
+    def __init__(self, x, y, team):
         """
         Construit un unité avec une position, et une team.
 
@@ -53,10 +53,6 @@ class Unit:
         self.y = y
         self.team = team #'player' ou 'enemy'
         self.__is_selected = False
-        self.game = game # 引用游戏实例以访问其他游戏元素
-        self.green_cases = []
-        
-    
     
   
     def move(self, dx, dy):

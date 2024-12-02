@@ -4,7 +4,6 @@ from unit import *
 class Skills:
     
     def __init__(self):
-    def __init__(self):
         self.critique = False
         self.miss = False
 

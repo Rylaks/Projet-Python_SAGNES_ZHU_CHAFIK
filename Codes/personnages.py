@@ -20,8 +20,8 @@ class Mage(Unit,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers e
     speed : int
         Vitesse de l'unité.
     """
-    def __init__(self,x ,y, team,game):
-        Unit.__init__(self,x,y,team,game)
+    def __init__(self,x ,y, team):
+        Unit.__init__(self,x,y,team)
         Skills.__init__(self)
         self.health = 10
         self.mana = 9 #commencera la partie avec 10 car en obtient 1 à chaque tour.
@@ -75,8 +75,8 @@ class Voleur(Unit,Skills):    #Voleur: vitesse grande, attaque faible, boucliers
     speed : int
         Vitesse de l'unité.
     """
-    def __init__(self,x ,y, team,game):
-        Unit.__init__(self,x,y,team,game)
+    def __init__(self,x ,y, team):
+        Unit.__init__(self,x,y,team)
         Skills.__init__(self)
         self.health = 10
         self.attack_power = 5
@@ -130,8 +130,8 @@ class Guerrier(Unit,Skills):    #Guerrier: vitesse faible, attaque grandes, bouc
     speed : int
         Vitesse de l'unité.
     """
-    def __init__(self,x ,y, team,game):
-        Unit.__init__(self,x,y,team,game)
+    def __init__(self,x ,y, team):
+        Unit.__init__(self,x,y,team)
         Skills.__init__(self)
         self.health = 30
         self.attack_power = 10
