@@ -4,10 +4,8 @@ import random
 from unit import *
 from personnages import *
 from skills import *
-from pointeur import *
-
-from unit import GRID_SIZE, CELL_SIZE, WIDTH, HEIGHT, WHITE, BLACK
-from diff_case import Bush, Rock,Water,Terrain
+from unit import *
+from diff_case import *
 
 class GameBoard:
     def __init__(self, size):
@@ -75,7 +73,7 @@ class Game:
                             Voleur(GRID_SIZE - 1, GRID_SIZE - 3, 'enemy'),
                             Guerrier(GRID_SIZE - 3, GRID_SIZE - 1, 'enemy')]
         
-        self.point = Pointeur(0,0)
+        self.point = Unit(0,0,"player")
         self.point_aff = False
         
         
@@ -127,6 +125,9 @@ class Game:
             if isinstance(selected_unit,Mage):
                 selected_unit.mana += 1
 
+            # Enregistrement de la position initiale de l'unité
+            temp1 = selected_unit.x
+            temp2 = selected_unit.y
 
             while not has_acted:
 
@@ -234,21 +235,24 @@ class Game:
                             if k != selected_unit and selected_unit.x + dx == k.x and selected_unit.y + dy == k.y:
                                 occupied = True
                                 break
-                        if not occupied:
+                        
+                        # Chaque unité à sa vitesse, et donc sa portée de déplacement
+                        if not occupied and temp1 - selected_unit.speed <= selected_unit.x + dx <= temp1 + selected_unit.speed and temp2 - selected_unit.speed <= selected_unit.y + dy <= temp2 + selected_unit.speed:
                             selected_unit.move(dx, dy)
                             self.flip_display()
 
-                        if attack:
+                        if attack: #attaque TOUS les ennemis qui sont à UN de distance.
                             for enemy in self.enemy_units:
-                                if isinstance(enemy,Voleur):
-                                    if not enemy.is_invisible:
+                                if abs(enemy.x - selected_unit.x) <= 1 and abs(enemy.y - selected_unit.y) <= 1:
+                                    if isinstance(enemy,Voleur):
+                                        if not enemy.is_invisible:
+                                            selected_unit.attack(enemy)
+                                            has_acted = True
+                                            selected_unit.is_selected = False
+                                    else:
                                         selected_unit.attack(enemy)
                                         has_acted = True
                                         selected_unit.is_selected = False
-                                else:
-                                    selected_unit.attack(enemy)
-                                    has_acted = True
-                                    selected_unit.is_selected = False
 
                         if no_action:
                             has_acted = True
@@ -284,10 +288,17 @@ class Game:
                                             dy = 1
                                         elif event.key == pygame.K_SPACE:
                                             choose = True  # Valide la cible
+                                        elif event.key == pygame.K_ESCAPE:
+                                            self.point_aff = False
+                                            choose = True
+                                            target = 1
+                                            special_skill = False
+                                            break  # Valide la cible
 
-                                        # Déplace le pointeur
-                                        self.point.move(dx, dy)
-                                        self.flip_display()
+                                        # Déplace le pointeur dans la portée de 3
+                                        if selected_unit.x - 3 <= self.point.x + dx <= selected_unit.x + 3 and selected_unit.y - 3 <= self.point.y + dy <= selected_unit.y + 3:
+                                            self.point.move(dx, dy)
+                                            self.flip_display()
                                         
                                         if choose:
                                             self.point_aff = False
@@ -321,14 +332,15 @@ class Game:
                                                     target = None
                                                     choose = False
                                     
-                            if isinstance(selected_unit,Guerrier):
+                            if special_skill and isinstance(selected_unit,Guerrier):
                                 selected_unit.bow(target)
                                 has_acted = True
-                            if isinstance(selected_unit,Mage):
-                                selected_unit.heal(target) #Peut accumuler des manas à tous les tours pour les utiiser d'un coup sur quelqu'un
+                            if special_skill and isinstance(selected_unit,Mage):
+                                selected_unit.heal(target) #Peut accumuler des manas à tous les tours pour les utiliser d'un coup sur quelqu'un
                                 has_acted = True
                                 selected_unit.is_selected = False
-                                    
+                            
+                            #Affichage des informations de coups critiques et manqués
                             if selected_unit.miss:
                                 font = pygame.font.Font(None, 40)
                                 y_offset = CELL_SIZE * target.y
@@ -354,9 +366,75 @@ class Game:
                                 pygame.time.wait(1000)
                                 selected_unit.critique = False
 
+                        elif special_skill_2 and isinstance(selected_unit,Mage):
+                            target = None
+                            choose = False
+                            self.point.x, self.point.y = selected_unit.x, selected_unit.y
+                            while not choose and target is None:
+                                self.point_aff = True
+                                self.flip_display() #affichage du pointeur
+                                for event in pygame.event.get():
+
+                                    if event.type == pygame.KEYDOWN:
+                                        dx, dy = 0, 0
+                                        if event.key == pygame.K_LEFT:
+                                            dx = -1
+                                        elif event.key == pygame.K_RIGHT:
+                                            dx = 1
+                                        elif event.key == pygame.K_UP:
+                                            dy = -1
+                                        elif event.key == pygame.K_DOWN:
+                                            dy = 1
+                                        elif event.key == pygame.K_SPACE:
+                                            choose = True  # Valide la cible
+                                        elif event.key == pygame.K_ESCAPE:
+                                            self.point_aff = False
+                                            choose = True
+                                            target = 1
+                                            special_skill_2 = False
+                                            break  # Valide la cible
+
+                                        # Déplace le pointeur dans la portée de 2
+                                        if selected_unit.x - 2 <= self.point.x + dx <= selected_unit.x + 2 and selected_unit.y - 2 <= self.point.y + dy <= selected_unit.y + 2:
+                                            self.point.move(dx, dy)
+                                            self.flip_display()
+                                        
+                                        if choose and special_skill_2:
+                                            self.point_aff = False
+                                            selected_unit.fire_ball(self.point.x, self.point.y, self.player_units + self.enemy_units)
+                                            has_acted = True
+
+                            #Affichage des informations de coups critiques et manqués
+                            if selected_unit.miss:
+                                font = pygame.font.Font(None, 40)
+                                y_offset = CELL_SIZE * self.point.y
+                                x_offset = CELL_SIZE * self.point.x
+                                a_status = f"Raté !"
+                                a_surface = font.render(a_status, True, RED)
+                                self.screen.blit(a_surface, (x_offset, y_offset))
+                                # Mettre à jour l'affichage
+                                pygame.display.flip()
+                                pygame.time.wait(1000)
+                                selected_unit.miss = False
+                                selected_unit.critique = False
+
+                            if selected_unit.critique and not selected_unit.miss:
+                                font = pygame.font.Font(None, 40)
+                                y_offset = CELL_SIZE * self.point.y
+                                x_offset = CELL_SIZE * self.point.x
+                                a_status = f"Critique !"
+                                a_surface = font.render(a_status, True, RED)
+                                self.screen.blit(a_surface, (x_offset, y_offset))
+                                # Mettre à jour l'affichage
+                                pygame.display.flip()
+                                pygame.time.wait(1000)
+                                selected_unit.critique = False
+
                         for enemy in self.enemy_units:
                             if enemy.health <= 0:
                                 self.enemy_units.remove(enemy)
+                        
+                        self.flip_display()
 
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
@@ -372,16 +450,12 @@ class Game:
             # Attaque si possible
             if abs(enemy.x - target.x) <= 1 and abs(enemy.y - target.y) <= 1:
                 enemy.attack(target)
-                if target.health <= 0:
+                if target.health < 0:
                     self.player_units.remove(target)
 
 
     def flip_display(self):
         """Affiche le jeu et le HUD."""
-
-
-
-        
 
         # Affiche la grille
         self.screen.fill(BLACK)
@@ -405,8 +479,11 @@ class Game:
             font = pygame.font.Font(None, 30)
             red = (255, 0, 0)
             info = "Choisir une cible avec les touches directionnelles"
+            info2 = "Echap pour annuler"
             info_surface = font.render(info, True, WHITE)
             self.screen.blit(info_surface, (CELL_SIZE * GRID_SIZE + 100, 10))
+            info_surface = font.render(info2, True, WHITE)
+            self.screen.blit(info_surface, (CELL_SIZE * GRID_SIZE + 200, 40))
 
         # Affiche le HUD
         self.draw_hud()
@@ -438,16 +515,16 @@ def main():
     pygame.mixer.music.play(-1)  # Joue en boucle infinie
 
     # Instanciation de la fenêtre
-    screen = pygame.display.set_mode((1400, 900))
+    screen = pygame.display.set_mode((1450, 750))
     pygame.display.set_caption("Mon jeu de stratégie")
 
     # Écran titre
     image = pygame.image.load("images/conte.jpg") #use / instead of \
     # Initialiser une police pour le texte
-    font = pygame.font.Font(None, 30)  # Police par défaut, taille 50
+    font = pygame.font.Font(None, 30)  # Police par défaut, taille 30
     text1 = font.render("Appuyez sur SPACE pour lancer le jeu", True, BLACK)
 
-    font = pygame.font.Font(None, 60)  # Police par défaut, taille 50
+    font = pygame.font.Font(None, 60)  # Police par défaut, taille 60
     text2 = font.render("Bienvenue dans la Comté !", True, BLACK) 
 
     # Obtenir la position centrale de l'image
