@@ -1,4 +1,5 @@
 
+
 import os
 import pygame
 from unit import CELL_SIZE
@@ -13,9 +14,13 @@ class Terrain:
         self.image = pygame.Surface((CELL_SIZE, CELL_SIZE))  # Crée une surface de base
         self.image.fill((100, 100, 100))  # Colore la surface en gris par défaut
 
-    def apply_effect(self, unit):
+    def stay_effect(self, unit):
         """Appliquer l'effet du terrain à l'unité, implémenté dans les sous-classes"""
         pass
+    
+    def apply_effect(self, unit):
+        """Appliquer l'effet du terrain à l'unité, implémenté dans les sous-classes"""
+        return True
 
     def remove_effect(self, unit):
         """Retirer l'effet du terrain sur l'unité, s'il y a un effet persistant"""
@@ -39,15 +44,16 @@ class Bush(Terrain):
     def apply_effect(self, unit):
         """Méthode appelée lorsque l'unité traverse un buisson"""
         unit.invisible = True  # Rend l'unité invisible
-        unit.speed *= 2  # Double la vitesse de l'unité
+        unit.speed = int(unit.speed *2)  # Double la vitesse de l'unité
         unit.turns_in_bush = 0  # Initialise le nombre de tours dans le buisson
-
+        return True
+    
     def stay_effect(self, unit):
         """Effet appliqué lorsque l'unité reste dans le buisson"""
         unit.turns_in_bush += 1  # Incrémente le nombre de tours dans le buisson
         unit.invisible = False  # Devient visible en restant
         if unit.turns_in_bush > 2:
-            unit.health += 10  # Si plus de deux tours, augmente la santé
+            unit.health += 1  # Si plus de deux tours, augmente la santé
 
     def remove_effect(self, unit):
         """Méthode appelée lorsque l'unité quitte le buisson"""
@@ -94,14 +100,15 @@ class Water(Terrain):
 
     def apply_effect(self, unit):
         """Méthode appelée lorsque l'unité traverse de l'eau"""
-        unit.speed *= 0.7  # Réduit la vitesse de 30%
+        unit.speed *= max(1, int(unit.speed * 0.7))  # 最小速度为 1，避免速度归零, Réduit la vitesse de 30%
         unit.turns_in_water = 0  # Initialise le nombre de tours dans l'eau
-
+        return True
+    
     def stay_effect(self, unit):
         """Effet appliqué lorsque l'unité reste dans l'eau"""
         unit.turns_in_water += 1  # Incrémente le nombre de tours dans l'eau
         if unit.turns_in_water > 2:
-            unit.health -= 10  # Si plus de deux tours, réduit la santé de 10
+            unit.health -= 1  # Si plus de deux tours, réduit la santé de 10
 
     def remove_effect(self, unit):
         """Méthode appelée lorsque l'unité quitte l'eau"""

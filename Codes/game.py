@@ -1,3 +1,4 @@
+
 import pygame
 import random
 
@@ -8,36 +9,34 @@ from unit import *
 from diff_case import *
 
 class GameBoard:
-    def __init__(self, size):
+    def __init__(self, size,occupied_positions):
         self.size = size
         self.grid = [[Terrain() for _ in range(size)] for _ in range(size)]
         
-        # Terrain herbeux aléatoire
-        num_bushes = random.randint(5, 10)  # En supposant qu'il y ait un à cinq buissons
-        for _ in range(num_bushes):
-            x, y = random.randint(0, size - 1), random.randint(0, size - 1)
-            self.grid[x][y] = Bush()
-
-
-        # Définir aléatoirement un terrain rocailleux
-        num_rocks = random.randint(3, 7)  # En supposant qu'il y ait un à cinq rochers
-        for _ in range(num_rocks):
-            x, y = random.randint(0, size - 1), random.randint(0, size - 1)
-            self.grid[x][y] = Rock()
-
-
-
-        # Terrain d'eau aléatoire
-        num_waters = random.randint(4, 8)  # Dans l'hypothèse d'un terrain d'eau de 1 à 5
-        for _ in range(num_waters):
-            x, y = random.randint(0, size - 1), random.randint(0, size - 1)
-            self.grid[x][y] = Water()
-
-
+        # Place bushes, rocks, and water avoiding character positions
+        self.place_terrain(Bush, random.randint(1, 3),occupied_positions)
+        self.place_terrain(Rock, random.randint(1, 5),occupied_positions)
+        self.place_terrain(Water, random.randint(1, 3),occupied_positions)
+        
+        
+        
+        
+    def place_terrain(self, terrain_class, count, occupied_positions):
+        for _ in range(count):   # Boucler pour garantir la création du nombre spécifié de terrains.
+            placed = False     # Indique que le terrain n'a pas encore été placé avec succès.
+            while not placed:   # Boucle pour choisir aléatoirement une position sur la carte jusqu'à ce qu'une position appropriée soit trouvée.
+                x, y = random.randint(0, self.size - 1), random.randint(0, self.size - 1)  # Génère aléatoirement les coordonnées x et y.
+                if (x, y) not in occupied_positions:  # Vérifie si les coordonnées générées (x, y) ne sont pas dans l'ensemble occupied_positions. Cet ensemble contient toutes les positions déjà occupées par les personnages, assurant ainsi que le terrain ne se superpose pas avec les positions des personnages.
+                    self.grid[y][x] = terrain_class()   # Si les coordonnées (x, y) ne sont pas dans occupied_positions, cela signifie que cette position peut accueillir un nouveau terrain.
+                    placed = True    # Mettre placed à True pour sortir de la boucle while, indiquant que le terrain a été placé avec succès.
+    
+    
+   
     def draw(self,screen):
         for y in range(self.size):
             for x in range(self.size):
                 self.grid[y][x].draw(screen,x,y) # Dessine chaque case
+                
 
 class Game:
     """
@@ -64,18 +63,25 @@ class Game:
             La surface de la fenêtre du jeu.
         """
         self.screen = screen
-        self.board = GameBoard(GRID_SIZE)
-        self.player_units = [Mage(0, 0, 'player'),
-                             Voleur(2, 0, 'player'),
-                             Guerrier(0, 2, 'player')]
+        #self.board = GameBoard(GRID_SIZE)
+        self.player_units = [Mage(0, 0, 'player',self),
+                             Voleur(2, 0, 'player',self),
+                             Guerrier(0, 2, 'player',self)]
 
-        self.enemy_units = [Mage(GRID_SIZE - 1, GRID_SIZE - 1, 'enemy'), 
-                            Voleur(GRID_SIZE - 1, GRID_SIZE - 3, 'enemy'),
-                            Guerrier(GRID_SIZE - 3, GRID_SIZE - 1, 'enemy')]
+        self.enemy_units = [Mage(GRID_SIZE - 1, GRID_SIZE - 1, 'enemy',self), 
+                            Voleur(GRID_SIZE - 1, GRID_SIZE - 3, 'enemy',self),
+                            Guerrier(GRID_SIZE - 3, GRID_SIZE - 1, 'enemy',self)]
         
         self.point = Unit(0,0,"player")
         self.point_aff = False
         
+    
+    def is_occupied(self, x, y):
+        for unit in self.player_units + self.enemy_units:
+            if unit.x == x and unit.y == y:
+                return True
+        return False
+
         
     def draw_hud(self):
         """Affiche les informations du HUD."""
@@ -111,11 +117,29 @@ class Game:
             self.screen.blit(unit_surface, (x_offset, y_offset))
             y_offset += 20
         
+   
 
     def handle_player_turn(self):
+        
         """Tour du joueur"""
+    
         for selected_unit in self.player_units:
-
+            self.player_units[0].is_selected = True
+            print("First unit selected:", self.player_units[0].is_selected)
+            
+            if selected_unit.is_selected:
+                
+                selected_unit.update_move_range()  # 确保调用此方法以计算移动范围
+                print("Updated move range:", selected_unit.green_cases)  # 打印出允许的移动范围
+                selected_unit.draw_move_range(self.screen) # 绘制移动范围
+                
+            
+            # 应用当前地形的停留效果
+            current_terrain = self.board.grid[selected_unit.y][selected_unit.x]
+            current_terrain.stay_effect(selected_unit)
+            
+            
+            
             # Tant que l'unité n'a pas terminé son tour
             has_acted = False
             selected_unit.is_selected = True
@@ -208,6 +232,7 @@ class Game:
 
                         # Déplacement (touches fléchées)
                         dx, dy = 0, 0
+                        
                         if event.key == pygame.K_LEFT:
                             dx = -1
                         elif event.key == pygame.K_RIGHT:
@@ -225,6 +250,7 @@ class Game:
                         elif event.key == pygame.K_4:
                             special_skill_2 = True
 
+                        
                         #éviter qu'une unité puisse aller sur une case déjà occupée
                         occupied = False
                         for k in self.player_units:
@@ -439,14 +465,31 @@ class Game:
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
         for enemy in self.enemy_units:
-            occupied = False
+            
+            # 应用当前地形的停留效果
+            current_terrain = self.board.grid[enemy.y][enemy.x]
+            current_terrain.stay_effect(enemy)
+            
+            
+            is_occupied = False
             # Déplacement aléatoire
             target = random.choice(self.player_units)
+            
             dx = 1 if enemy.x < target.x else -1 if enemy.x > target.x else 0
             dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
-                
-            enemy.move(dx, dy)
+            
+            
+            # 检查目标位置是否已被其他单位占据
+            new_x, new_y = enemy.x + dx, enemy.y + dy
+            # 使用is_occupied方法检查该位置是否被占用
+            if not self.is_occupied(new_x, new_y):  
+                enemy.move(dx, dy)
 
+                # 重新应用移动后的地形效果
+                current_terrain = self.board.grid[enemy.y][enemy.x]
+                current_terrain.stay_effect(enemy)
+            
+            
             # Attaque si possible
             if abs(enemy.x - target.x) <= 1 and abs(enemy.y - target.y) <= 1:
                 enemy.attack(target)
@@ -462,6 +505,11 @@ class Game:
 
         #Affiche les terrains depuis le gameBoard
         self.board.draw(self.screen)
+        
+        # 这里调用绘制移动范围，确保每次屏幕更新都能看到
+        for unit in self.player_units:
+            if unit.is_selected:
+                unit.draw_move_range(self.screen)
 
         for x in range(0, WIDTH, CELL_SIZE):
             for y in range(0, HEIGHT, CELL_SIZE):
