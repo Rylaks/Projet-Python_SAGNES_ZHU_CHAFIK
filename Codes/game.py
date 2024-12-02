@@ -1,3 +1,4 @@
+
 import pygame
 import random
 
@@ -22,7 +23,7 @@ class GameBoard:
 
 
         # Définir aléatoirement un terrain rocailleux
-        num_rocks = random.randint(3, 7)  # En supposant qu'il y ait un à cinq rochers
+        num_rocks = random.randint(1, 5)  # En supposant qu'il y ait un à cinq rochers
         for _ in range(num_rocks):
             x, y = random.randint(0, size - 1), random.randint(0, size - 1)
             self.grid[x][y] = Rock()
@@ -67,13 +68,13 @@ class Game:
         """
         self.screen = screen
         self.board = GameBoard(GRID_SIZE)
-        self.player_units = [Mage(0, 0, 'player'),
-                             Voleur(2, 0, 'player'),
-                             Guerrier(0, 2, 'player')]
+        self.player_units = [Mage(0, 0, 'player',self),
+                             Voleur(2, 0, 'player',self),
+                             Guerrier(0, 2, 'player',self)]
 
-        self.enemy_units = [Mage(GRID_SIZE - 1, GRID_SIZE - 1, 'enemy'), 
-                            Voleur(GRID_SIZE - 1, GRID_SIZE - 3, 'enemy'),
-                            Guerrier(GRID_SIZE - 3, GRID_SIZE - 1, 'enemy')]
+        self.enemy_units = [Mage(GRID_SIZE - 1, GRID_SIZE - 1, 'enemy',self), 
+                            Voleur(GRID_SIZE - 1, GRID_SIZE - 3, 'enemy',self),
+                            Guerrier(GRID_SIZE - 3, GRID_SIZE - 1, 'enemy',self)]
         
         self.point = Pointeur(0,0)
         self.point_aff = False
@@ -117,7 +118,11 @@ class Game:
     def handle_player_turn(self):
         """Tour du joueur"""
         for selected_unit in self.player_units:
-
+            # 应用当前地形的停留效果
+            current_terrain = self.board.grid[selected_unit.y][selected_unit.x]
+            current_terrain.stay_effect(selected_unit)
+            
+            
             # Tant que l'unité n'a pas terminé son tour
             has_acted = False
             selected_unit.is_selected = True
@@ -207,14 +212,15 @@ class Game:
 
                         # Déplacement (touches fléchées)
                         dx, dy = 0, 0
+                        speed = int(selected_unit.speed)  # 获取单位当前速度
                         if event.key == pygame.K_LEFT:
-                            dx = -1
+                            dx = -speed# 如果是-1，他就只会移动一格，不是他的速度了
                         elif event.key == pygame.K_RIGHT:
-                            dx = 1
+                            dx = speed
                         elif event.key == pygame.K_UP:
-                            dy = -1
+                            dy = -speed
                         elif event.key == pygame.K_DOWN:
-                            dy = 1
+                            dy = speed
                         elif event.key == pygame.K_1:
                             no_action = True
                         elif event.key == pygame.K_2:
@@ -224,19 +230,30 @@ class Game:
                         elif event.key == pygame.K_4:
                             special_skill_2 = True
 
+                        
                         #éviter qu'une unité puisse aller sur une case déjà occupée
-                        occupied = False
-                        for k in self.player_units:
-                            if k != selected_unit and selected_unit.x + dx == k.x and selected_unit.y + dy == k.y:
-                                occupied = True
-                                break
-                        for k in self.enemy_units:
-                            if k != selected_unit and selected_unit.x + dx == k.x and selected_unit.y + dy == k.y:
-                                occupied = True
-                                break
-                        if not occupied:
-                            selected_unit.move(dx, dy)
-                            self.flip_display()
+                        
+                        if dx != 0 or dy != 0:
+                            occupied = False
+                            new_x = selected_unit.x + dx
+                            new_y = selected_unit.y + dy
+                            
+                            for k in self.player_units:
+                                if k != selected_unit and selected_unit.x + dx == k.x and selected_unit.y + dy == k.y:
+                                    occupied = True
+                                    break
+                            for k in self.enemy_units:
+                                if k != selected_unit and selected_unit.x + dx == k.x and selected_unit.y + dy == k.y:
+                                    occupied = True
+                                    break
+                            if not occupied:
+                                
+                                selected_unit.move(dx, dy)
+                                # 移动后重新获取地形并应用停留效果
+                                current_terrain = self.board.grid[selected_unit.y][selected_unit.x]
+                                current_terrain.stay_effect(selected_unit)
+                                
+                                self.flip_display()
 
                         if attack:
                             for enemy in self.enemy_units:
@@ -325,7 +342,7 @@ class Game:
                                 selected_unit.bow(target)
                                 has_acted = True
                             if isinstance(selected_unit,Mage):
-                                selected_unit.heal(target) #Peut accumuler des manas à tous les tours pour les utiiser d'un coup sur quelqu'un
+                                selected_unit.health(target) #Peut accumuler des manas à tous les tours pour les utiiser d'un coup sur quelqu'un
                                 has_acted = True
                                 selected_unit.is_selected = False
                                     
@@ -361,14 +378,34 @@ class Game:
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
         for enemy in self.enemy_units:
+            
+            # 应用当前地形的停留效果
+            current_terrain = self.board.grid[enemy.y][enemy.x]
+            current_terrain.stay_effect(enemy)
+            
+            
             occupied = False
             # Déplacement aléatoire
             target = random.choice(self.player_units)
             dx = 1 if enemy.x < target.x else -1 if enemy.x > target.x else 0
             dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
-                
-            enemy.move(dx, dy)
+            
+            
+            # 检查目标位置是否已被其他单位占据
+            new_x, new_y = enemy.x + dx, enemy.y + dy
+            for unit in self.player_units + self.enemy_units:
+                if unit.x == new_x and unit.y == new_y and unit != enemy:
+                    occupied = True
+                    break
+            
+            if not occupied:    
+                enemy.move(dx, dy)
 
+                # 重新应用移动后的地形效果
+                current_terrain = self.board.grid[enemy.y][enemy.x]
+                current_terrain.stay_effect(enemy)
+            
+            
             # Attaque si possible
             if abs(enemy.x - target.x) <= 1 and abs(enemy.y - target.y) <= 1:
                 enemy.attack(target)

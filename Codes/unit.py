@@ -1,3 +1,4 @@
+
 import pygame
 import random
 
@@ -35,7 +36,7 @@ class Unit:
         Dessine l'unité sur la grille.
     """
 
-    def __init__(self, x, y, team):
+    def __init__(self, x, y, team,game):
         """
         Construit un unité avec une position, et une team.
 
@@ -52,20 +53,27 @@ class Unit:
         self.__y = y
         self.team = team #'player' ou 'enemy'
         self.__is_selected = False
+        self.game = game # 引用游戏实例以访问其他游戏元素
 
     def move(self, dx, dy):
-        if 0 <= self.__x + dx < GRID_SIZE and 0 <= self.__y + dy < GRID_SIZE:
-            self.__x += dx
-            self.__y += dy
-        """
-        new_x = self.__x + dx
-        new_y = self.__y + dy
+        dx = int(dx)
+        dy = int(dy)
+        
+        new_x = int(self.__x + dx)
+        new_y = int(self.__y + dy)
+        
         if 0 <= new_x < GRID_SIZE and 0 <= new_y < GRID_SIZE:
-            mise a jour le type de terrain
-            target_terrain = self.game.board.grid[new_y][new_x]
+            # mise a jour le type de terrain
+            old_terrain = self.game.board.grid[self.__y][self.__x]
+            new_terrain = self.game.board.grid[new_y][new_x]
+
+            # 检查地形是否允许移动
+            can_move = new_terrain.apply_effect(self)
+            print(f"Trying to move to ({new_x}, {new_y}) - Move allowed: {can_move}")
 
             # Check if the terrain allows movement
-            if target_terrain.apply_effect(self): # Mise à jour de la position si le mouvement est autorisé
+            if can_move: # Mise à jour de la position si le mouvement est autorisé
+                old_terrain.remove_effect(self)
                 self.__x = new_x
                 self.__y = new_y
                 print("Unit moved to:", new_x, new_y)
@@ -73,10 +81,10 @@ class Unit:
                 print("Movement blocked by terrain at:", new_x, new_y)
 
             
-            # Indépendamment du mouvement, appeler les effets de l'immobilisation du terrain
-            target_terrain.stay_effect(self)
-        """
-
+    
+    
+    
+    
     @property
     def x(self):
         return self.__x

@@ -20,14 +20,16 @@ class Mage(Unit,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers e
     speed : int
         Vitesse de l'unité.
     """
-    def __init__(self,x ,y, team):
-        Unit.__init__(self,x,y,team)
+    def __init__(self,x ,y, team,game):
+        Unit.__init__(self,x,y,team,game)
         Skills.__init__(self)
         self.health = 10
         self.mana = 9 #commencera la partie avec 10 car en obtient 1 à chaque tour.
         self.attack_power = 8
         self.defense_shield = 3
         self.speed = 3
+        self.turns_in_water = 0  # 初始化在水中的回合数
+        self.turns_in_bush = 0   # 初始化在灌木中的回合数
         if team == "player":
             self.nom = "Gandalf le Gris"
         elif team == "enemy":
@@ -73,14 +75,16 @@ class Voleur(Unit,Skills):    #Voleur: vitesse grande, attaque faible, boucliers
     speed : int
         Vitesse de l'unité.
     """
-    def __init__(self,x ,y, team):
-        Unit.__init__(self,x,y,team)
+    def __init__(self,x ,y, team,game):
+        Unit.__init__(self,x,y,team,game)
         Skills.__init__(self)
         self.health = 10
         self.attack_power = 5
         self.is_invisible = False
         self.defense_shield = 7
         self.speed = 5
+        self.turns_in_water = 0  # 初始化在水中的回合数
+        self.turns_in_bush = 0   # 初始化在灌木中的回合数
         if team == "player":
             self.nom = "Bilbon"
         elif team == "enemy":
@@ -126,13 +130,15 @@ class Guerrier(Unit,Skills):    #Guerrier: vitesse faible, attaque grandes, bouc
     speed : int
         Vitesse de l'unité.
     """
-    def __init__(self,x ,y, team):
-        Unit.__init__(self,x,y,team)
+    def __init__(self,x ,y, team,game):
+        Unit.__init__(self,x,y,team,game)
         Skills.__init__(self)
         self.health = 30
         self.attack_power = 10
         self.defense_shield = 10
         self.speed = 2
+        self.turns_in_water = 0  # 初始化在水中的回合数
+        self.turns_in_bush = 0   # 初始化在灌木中的回合数
         if team == "player":
             self.nom = "Aragorn"
         elif team == "enemy":
