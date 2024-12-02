@@ -34,14 +34,10 @@ class Portee:
     
     
     def __init__(self,x_range,y_range):
-        """ on initialise la portee en fonction des distance autorisée """
-        
+        """ on initialise la portee en fonction des distance autorisée """ 
         self.x_range=x_range
         self.y_range=y_range 
         
-    def est_dans_portee(self,target):
-        """ verifie si la cible est dans la portee 
-            Return True si la cible est dans la portee et False sinon""" 
-        
-        return (abs(self.x - target.x) <=self.x_range  and abs(self.y - target.y) <= self.y_range)
-
+   
+          
+# on veut utiliser la competence sur un endroit et toutes les cibles alentours seront atteinte 

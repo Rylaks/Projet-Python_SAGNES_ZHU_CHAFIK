@@ -1,9 +1,12 @@
-import pygame
 import random
+import pygame 
 
+
+from unit import GRID_SIZE , CELL_SIZE, WHITE, RED, BLACK, WIDTH, HEIGHT, GREEN 
 from unit import *
 from personnages import *
-from skills import *
+from skills import * 
+from skills import Skills
 from pointeur import *
 
 from diff_case import Bush, Rock,Water,Terrain
@@ -65,7 +68,7 @@ class Game:
             La surface de la fenêtre du jeu.
         """
         self.screen = screen
-        #self.board = GameBoard(board_size)
+        self.board = GameBoard(GRID_SIZE)
         self.player_units = [Mage(0, 0, 'player'),
                              Voleur(2, 0, 'player'),
                              Guerrier(0, 2, 'player')]
@@ -203,6 +206,8 @@ class Game:
 
                     # Gestion des touches du clavier
                     if event.type == pygame.KEYDOWN:
+                        
+                        
 
                         # Déplacement (touches fléchées)
                         dx, dy = 0, 0
@@ -238,16 +243,28 @@ class Game:
                             self.flip_display()
 
                         if attack:
+                            
+                            #Récupérer les cibles dans la portée
+                            cibles_dans_portee = self.skills.obtenir_cibles_dans_portee(selected_unit, "attack")
+                            couleur = (255, 0, 0)  # Rouge pour les ennemis
+                            #Dessiner la surbrillance autour des cibles
+                            self.surbrillance_cibles(self.screen, cibles_dans_portee, couleur)
+                            
+                            # Mettre à jour l'affichage
+                            self.flip_display()
+
                             for enemy in self.enemy_units:
-                                if isinstance(enemy,Voleur):
-                                    if not enemy.is_invisible:
+                            
+                                #if enemy in  cibles_dans_portee : # on verfie que l'ennemi visé est dans la portee
+                                    if isinstance(enemy,Voleur):
+                                        if not enemy.is_invisible:
+                                            selected_unit.attack(enemy)
+                                            has_acted = True
+                                            selected_unit.is_selected = False
+                                    else:
                                         selected_unit.attack(enemy)
                                         has_acted = True
                                         selected_unit.is_selected = False
-                                else:
-                                    selected_unit.attack(enemy)
-                                    has_acted = True
-                                    selected_unit.is_selected = False
 
                         if no_action:
                             has_acted = True
@@ -263,6 +280,7 @@ class Game:
 
                         #Sélection d'une cible
                         elif special_skill:
+                            
                             target = None
                             choose = False
                             self.point.x, self.point.y = selected_unit.x, selected_unit.y  # Centrez le pointeur sur l'unité
@@ -421,6 +439,24 @@ class Game:
 
         # Rafraîchit l'écran
         pygame.display.flip()
+        
+        
+    
+    #methode qui dessine une surbrillance autour des cibles     
+        
+    def surbrillance_cibles(screen, cibles, couleur):
+        """
+        Dessine une surbrillance autour des cibles.
+    """
+        for cible in cibles:
+            pygame.draw.rect(
+                screen, couleur,
+                (cible.x * CELL_SIZE, cible.y * CELL_SIZE, CELL_SIZE, CELL_SIZE),
+                3  # Épaisseur de la bordure
+        )
+
+
+    
 
 
 
@@ -433,7 +469,7 @@ def main():
 
     #Initialisation de la musique
     pygame.mixer.init()
-    pygame.mixer.music.load("music\The_Bridge_of_Khazad_Dum.mp3")
+    pygame.mixer.music.load("music/The_Shire.mp3")
     pygame.mixer.music.play(-1)  # Joue en boucle infinie
 
     # Instanciation de la fenêtre
@@ -490,7 +526,7 @@ def main():
 
     #Initialisation de la musique
     pygame.mixer.init()
-    pygame.mixer.music.load("music\The_Battle_of_the_Pelennor_Fields.mp3")
+    pygame.mixer.music.load("music/The_Battle_of_the_Pelennor_Fields.mp3")
     pygame.mixer.music.play(-1)  # Joue en boucle infinie
 
     game = Game(screen)
