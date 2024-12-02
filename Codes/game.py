@@ -452,11 +452,11 @@ class Game:
         for enemy in self.enemy_units:
             
             # 应用当前地形的停留效果
-            current_terrain = self.board.grid[enemy.y][enemy.x]
-            current_terrain.stay_effect(enemy)
+            #current_terrain = self.board.grid[enemy.y][enemy.x]
+            #current_terrain.stay_effect(enemy)
             
             
-            is_occupied = False
+            #is_occupied = False
             # Déplacement aléatoire
             target = random.choice(self.player_units)
             
@@ -465,14 +465,14 @@ class Game:
             
             
             # 检查目标位置是否已被其他单位占据
-            new_x, new_y = enemy.x + dx, enemy.y + dy
+            #new_x, new_y = enemy.x + dx, enemy.y + dy
             # 使用is_occupied方法检查该位置是否被占用
-            if not self.is_occupied(new_x, new_y):  
-                enemy.move(dx, dy)
+            #if not self.is_occupied(new_x, new_y):  
+                #enemy.move(dx, dy)
 
                 # 重新应用移动后的地形效果
-                current_terrain = self.board.grid[enemy.y][enemy.x]
-                current_terrain.stay_effect(enemy)
+                #current_terrain = self.board.grid[enemy.y][enemy.x]
+                #current_terrain.stay_effect(enemy)
             
             
             # Attaque si possible
