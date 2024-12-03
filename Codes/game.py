@@ -8,7 +8,7 @@ from skills import *
 from pointeur import *
 from diff_case import*
 
-
+#abcdefj
 
 
 class GameBoard:
