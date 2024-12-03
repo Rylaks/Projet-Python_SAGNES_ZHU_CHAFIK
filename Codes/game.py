@@ -64,15 +64,19 @@ class Game:
         """
         self.screen = screen
         #self.board = GameBoard(GRID_SIZE)
-        self.player_units = [Mage(0, 0, 'player'),
-                             Voleur(2, 0, 'player'),
-                             Guerrier(0, 2, 'player')]
+        self.player_units = [Mage(0, 0, 'player',self),
+                             Voleur(2, 0, 'player',self),
+                             Guerrier(0, 2, 'player',self)]
 
-        self.enemy_units = [Mage(GRID_SIZE - 1, GRID_SIZE - 1, 'enemy'), 
-                            Voleur(GRID_SIZE - 1, GRID_SIZE - 3, 'enemy'),
-                            Guerrier(GRID_SIZE - 3, GRID_SIZE - 1, 'enemy')]
+        self.enemy_units = [Mage(GRID_SIZE - 1, GRID_SIZE - 1, 'enemy',self), 
+                            Voleur(GRID_SIZE - 1, GRID_SIZE - 3, 'enemy',self),
+                            Guerrier(GRID_SIZE - 3, GRID_SIZE - 1, 'enemy',self)]
         
-        self.point = Unit(0,0,"player")
+        
+        # Collect positions of all characters to avoid terrain overlap
+        occupied_positions = {(unit.x, unit.y) for unit in self.player_units + self.enemy_units}
+        self.board = GameBoard(GRID_SIZE, occupied_positions)
+        self.point = Unit(0,0,"player",self)
         self.point_aff = False
         
     
@@ -124,11 +128,22 @@ class Game:
         """Tour du joueur"""
     
         for selected_unit in self.player_units:
-    
+            
+            
             # Tant que l'unité n'a pas terminé son tour
             has_acted = False
             selected_unit.is_selected = True
+            if selected_unit.is_selected:
+                selected_unit.update_move_range()  # 确保调用此方法以计算移动范围
+                print("Updated move range:", selected_unit.green_cases)  # 打印出允许的移动范围
+                selected_unit.draw_move_range(self.screen)  # 绘制移动范围
+                
+                # 应用当前地形的停留效果
+                current_terrain = self.board.grid[selected_unit.y][selected_unit.x]
+                current_terrain.stay_effect(selected_unit)
+
             self.flip_display()
+                
 
             # Si l'unité est un mage, il récupère 1 point de mana par tour
             if isinstance(selected_unit,Mage):
@@ -237,20 +252,23 @@ class Game:
 
                         
                         #éviter qu'une unité puisse aller sur une case déjà occupée
-                        occupied = False
-                        for k in self.player_units:
-                            if k != selected_unit and selected_unit.x + dx == k.x and selected_unit.y + dy == k.y:
-                                occupied = True
-                                break
-                        for k in self.enemy_units:
-                            if k != selected_unit and selected_unit.x + dx == k.x and selected_unit.y + dy == k.y:
-                                occupied = True
-                                break
                         
-                        # Chaque unité à sa vitesse, et donc sa portée de déplacement
-                        if not occupied and temp1 - selected_unit.speed <= selected_unit.x + dx <= temp1 + selected_unit.speed and temp2 - selected_unit.speed <= selected_unit.y + dy <= temp2 + selected_unit.speed:
-                            selected_unit.move(dx, dy)
-                            self.flip_display()
+                        if dx != 0 or dy != 0:
+                            
+                            new_x = selected_unit.x + dx
+                            new_y = selected_unit.y + dy
+                            
+                            
+                            if not self.is_occupied(new_x,new_y):
+                                
+                                selected_unit.move(dx, dy)
+                                # 移动后重新获取地形并应用停留效果
+                                current_terrain = self.board.grid[selected_unit.y][selected_unit.x]
+                                current_terrain.stay_effect(selected_unit)
+                                
+                                self.flip_display()
+                        
+                    
 
                         if attack: #attaque TOUS les ennemis qui sont à UN de distance.
                             for enemy in self.enemy_units:
@@ -452,11 +470,11 @@ class Game:
         for enemy in self.enemy_units:
             
             # 应用当前地形的停留效果
-            #current_terrain = self.board.grid[enemy.y][enemy.x]
-            #current_terrain.stay_effect(enemy)
+            current_terrain = self.board.grid[enemy.y][enemy.x]
+            current_terrain.stay_effect(enemy)
             
             
-            #is_occupied = False
+            is_occupied = False
             # Déplacement aléatoire
             target = random.choice(self.player_units)
             
@@ -465,14 +483,14 @@ class Game:
             
             
             # 检查目标位置是否已被其他单位占据
-            #new_x, new_y = enemy.x + dx, enemy.y + dy
+            new_x, new_y = enemy.x + dx, enemy.y + dy
             # 使用is_occupied方法检查该位置是否被占用
-            #if not self.is_occupied(new_x, new_y):  
-                #enemy.move(dx, dy)
+            if not self.is_occupied(new_x, new_y):  
+                enemy.move(dx, dy)
 
                 # 重新应用移动后的地形效果
-                #current_terrain = self.board.grid[enemy.y][enemy.x]
-                #current_terrain.stay_effect(enemy)
+                current_terrain = self.board.grid[enemy.y][enemy.x]
+                current_terrain.stay_effect(enemy)
             
             
             # Attaque si possible
@@ -487,6 +505,15 @@ class Game:
 
         # Affiche la grille
         self.screen.fill(BLACK)
+        
+        #Affiche les terrains depuis le gameBoard
+        self.board.draw(self.screen)
+        
+        # 这里调用绘制移动范围，确保每次屏幕更新都能看到
+        for unit in self.player_units:
+            if unit.is_selected:
+                unit.draw_move_range(self.screen)
+
 
         for x in range(0, WIDTH, CELL_SIZE):
             for y in range(0, HEIGHT, CELL_SIZE):

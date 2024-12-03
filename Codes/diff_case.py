@@ -44,7 +44,7 @@ class Bush(Terrain):
     def apply_effect(self, unit):
         """Méthode appelée lorsque l'unité traverse un buisson"""
         unit.invisible = True  # Rend l'unité invisible
-        unit.speed = int(unit.speed *2)  # Double la vitesse de l'unité
+        unit.speed = int(unit.speed *1.5)  # Double la vitesse de l'unité
         unit.turns_in_bush = 0  # Initialise le nombre de tours dans le buisson
         return True
     
@@ -112,5 +112,5 @@ class Water(Terrain):
 
     def remove_effect(self, unit):
         """Méthode appelée lorsque l'unité quitte l'eau"""
-        unit.speed /= 0.7  # Restaure la vitesse originale
+        unit.speed /= 0.5  # Restaure la vitesse originale
         unit.turns_in_water = 0  # Réinitialise le nombre de tours dans l'eau
