@@ -28,6 +28,7 @@ class Mage(Unit,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers e
         self.attack_power = 8
         self.defense_shield = 3
         self.speed = 3
+        self.original_speed = self.speed
         self.turns_in_water = 0  # 初始化在水中的回合数
         self.turns_in_bush = 0   # 初始化在灌木中的回合数
         if team == "player":
@@ -83,6 +84,7 @@ class Voleur(Unit,Skills):    #Voleur: vitesse grande, attaque faible, boucliers
         self.is_invisible = False
         self.defense_shield = 7
         self.speed = 5
+        self.original_speed = self.speed
         self.turns_in_water = 0  # 初始化在水中的回合数
         self.turns_in_bush = 0   # 初始化在灌木中的回合数
         if team == "player":
@@ -137,6 +139,7 @@ class Guerrier(Unit,Skills):    #Guerrier: vitesse faible, attaque grandes, bouc
         self.attack_power = 10
         self.defense_shield = 10
         self.speed = 2
+        self.original_speed = self.speed
         self.turns_in_water = 0  # 初始化在水中的回合数
         self.turns_in_bush = 0   # 初始化在灌木中的回合数
         if team == "player":

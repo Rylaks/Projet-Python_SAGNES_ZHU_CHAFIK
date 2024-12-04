@@ -129,22 +129,28 @@ class Game:
     
         for selected_unit in self.player_units:
             
-            
             # Tant que l'unité n'a pas terminé son tour
-            has_acted = False
-            selected_unit.is_selected = True
-            if selected_unit.is_selected:
-                selected_unit.update_move_range()  # 确保调用此方法以计算移动范围
-                print("Updated move range:", selected_unit.green_cases)  # 打印出允许的移动范围
-                selected_unit.draw_move_range(self.screen)  # 绘制移动范围
-                
-                # 应用当前地形的停留效果
-                current_terrain = self.board.grid[selected_unit.y][selected_unit.x]
-                current_terrain.stay_effect(selected_unit)
-
+            selected_unit.is_selected = True # 标记单位为选中状态，显示移动范围
+            
+            # 更新单位当前所在地形的效果（影响下一次移动）
+            current_terrain = self.board.grid[selected_unit.y][selected_unit.x]
+            current_terrain.apply_effect(selected_unit)  # 更新效果，如速度变化
+            
+            # 更新当前单位的移动范围
+            selected_unit.update_move_range()
+            selected_unit.draw_move_range(self.screen)#高亮能走到的范围
+            
+             # Affichage du joueur
+            font = pygame.font.Font(None, 40)
+            y_offset = 10
+            x_offset = CELL_SIZE * GRID_SIZE + 100
+            unit_status = f"C'est à {selected_unit.nom} de jouer !"
+            unit_surface = font.render(unit_status, True, WHITE)
+            self.screen.blit(unit_surface, (x_offset, y_offset))
+            # Mettre à jour l'affichage
+            #pygame.display.flip() 
             self.flip_display()
-                
-
+            
             # Si l'unité est un mage, il récupère 1 point de mana par tour
             if isinstance(selected_unit,Mage):
                 selected_unit.mana += 1
@@ -153,18 +159,10 @@ class Game:
             temp1 = selected_unit.x
             temp2 = selected_unit.y
 
+            has_acted = False # 标记该单位是否完成行动，目前没有完成行动
+            
             while not has_acted:
-
-                # Affichage du joueur
-                font = pygame.font.Font(None, 40)
-                y_offset = 10
-                x_offset = CELL_SIZE * GRID_SIZE + 100
-                unit_status = f"C'est à {selected_unit.nom} de jouer !"
-                unit_surface = font.render(unit_status, True, WHITE)
-                self.screen.blit(unit_surface, (x_offset, y_offset))
-                # Mettre à jour l'affichage
-                pygame.display.flip()
-
+              
                 if isinstance(selected_unit,Mage):
                     font = pygame.font.Font(None, 40)
                     y_offset = 100
@@ -251,24 +249,26 @@ class Game:
                             special_skill_2 = True
 
                         
-                        #éviter qu'une unité puisse aller sur une case déjà occupée
+                        #获取新位置
                         
-                        if dx != 0 or dy != 0:
-                            
-                            new_x = selected_unit.x + dx
-                            new_y = selected_unit.y + dy
-                            
-                            
-                            if not self.is_occupied(new_x,new_y):
-                                
-                                selected_unit.move(dx, dy)
-                                # 移动后重新获取地形并应用停留效果
-                                current_terrain = self.board.grid[selected_unit.y][selected_unit.x]
-                                current_terrain.stay_effect(selected_unit)
-                                
-                                self.flip_display()
+                        new_x = selected_unit.x + dx
+                        new_y = selected_unit.y + dy
                         
-                    
+                        
+                        if (new_x, new_y) in selected_unit.green_cases:
+                            
+                            # **移除当前地形效果**
+                            old_terrain = self.board.grid[selected_unit.y][selected_unit.x]
+                            new_terrain = self.board.grid[new_y][new_x]   
+                            
+                            old_terrain.remove_effect(selected_unit)  # 移除当前地形效果
+                            selected_unit.move(dx, dy)  # 执行移动                         
+                            new_terrain.apply_effect(selected_unit)  # 应用新地形效果
+                            
+                            
+                                
+                            self.flip_display()  # 更新屏幕
+                        
 
                         if attack: #attaque TOUS les ennemis qui sont à UN de distance.
                             for enemy in self.enemy_units:
@@ -464,7 +464,26 @@ class Game:
                                 self.enemy_units.remove(enemy)
                         
                         self.flip_display()
+                    # 重置选择状态
+            
+            selected_unit.is_selected = False
+            self.flip_display()
+            
+            
+            
+            # 强制重置速度为原始速度
+            selected_unit.speed = selected_unit.original_speed
+            
+             # 如果单位没有移动到新地形，则触发停留效果
+            if selected_unit.x == temp1 and selected_unit.y == temp2:
+                current_terrain.stay_effect(selected_unit)  # 触发停留效果
 
+            self.flip_display()  # 每次单位行动完成后更新显示
+                        
+
+    
+    
+    
     def handle_enemy_turn(self):
         """IA très simple pour les ennemis."""
         for enemy in self.enemy_units:
@@ -509,7 +528,7 @@ class Game:
         #Affiche les terrains depuis le gameBoard
         self.board.draw(self.screen)
         
-        # 这里调用绘制移动范围，确保每次屏幕更新都能看到
+        # 绘制当前选中单位的绿色格子
         for unit in self.player_units:
             if unit.is_selected:
                 unit.draw_move_range(self.screen)

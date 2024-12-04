@@ -1,4 +1,3 @@
-
 import pygame
 import random
 
@@ -55,6 +54,7 @@ class Unit:
         self.__is_selected = False
         self.game = game # 引用游戏实例以访问其他游戏元素
         self.green_cases = []
+        
     
   
     def move(self, dx, dy):
@@ -89,20 +89,21 @@ class Unit:
                 print("Movement blocked by terrain at:", new_x, new_y)
 
     def update_move_range(self):
-        print(f"Updating move range for {self.__class__.__name__} at ({self.x}, {self.y})")
-        speed = self.speed  # 获取当前单位的速度
+        self.green_cases = [] # 清空旧的移动范围
         
         start_x, start_y = self.x, self.y  # 获取当前单位的位置
-        
+        speed = int(self.speed)
         print(f"Speed: {speed}, Position: ({self.x}, {self.y})")  # 打印速度和位置
         
-        self.green_cases = [(start_x, start_y)]  # 初始化或重置格子列表
+        # 包括单位当前所在格子
+        self.green_cases.append((start_x, start_y))
         
         # 遍历以单位为中心的正方形区域
-        for dy in range(int(-speed/2), int((speed + 1)/2)):
-            for dx in range(int(-speed/2), int((speed + 1)/2)):
+        for dy in range(-speed, speed + 1):
+            for dx in range(-speed, speed + 1):
                 green_x = start_x + dx
                 green_y = start_y + dy
+                
                 # 确保格子在边界内
                 if 0 <= green_x < GRID_SIZE and 0 <= green_y < GRID_SIZE:
                     # 检查格子是否被占用
@@ -110,9 +111,10 @@ class Unit:
                         
                         terrain = self.game.board.grid[green_y][green_x]
                         
-                        if (green_x == start_x and green_y == start_y) or terrain.apply_effect(self):
+                        if terrain.apply_effect(self):
                             self.green_cases.append((green_x, green_y))
-     
+        
+        print(f"{self.nom}'s move range updated: {self.green_cases}")
      
      
     def draw_move_range(self, screen):

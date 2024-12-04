@@ -1,5 +1,3 @@
-
-
 import os
 import pygame
 from unit import CELL_SIZE
@@ -42,10 +40,15 @@ class Bush(Terrain):
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))# assurer qu l'image est le bon size
 
     def apply_effect(self, unit):
-        """Méthode appelée lorsque l'unité traverse un buisson"""
-        unit.invisible = True  # Rend l'unité invisible
-        unit.speed = int(unit.speed *1.5)  # Double la vitesse de l'unité
-        unit.turns_in_bush = 0  # Initialise le nombre de tours dans le buisson
+     
+        if not hasattr(unit, 'original_speed'):
+            unit.original_speed = unit.speed  # 存储原始速度
+        unit.invisible = True  # 隐身
+        print(f"Before apply: {unit.speed}")
+        unit.speed = unit.original_speed * 2  # 双倍速度
+        print(f"After apply: {unit.speed}")
+
+        unit.turns_in_bush = 0  # 初始化在草地的回合数
         return True
     
     def stay_effect(self, unit):
@@ -56,11 +59,15 @@ class Bush(Terrain):
             unit.health += 1  # Si plus de deux tours, augmente la santé
 
     def remove_effect(self, unit):
+        print(f"Before remove: {unit.speed}")
         """Méthode appelée lorsque l'unité quitte le buisson"""
-        unit.invisible = False  # Rend l'unité visible
-        unit.speed /= 2  # Restaure la vitesse originale
-        unit.turns_in_bush = 0  # Réinitialise le nombre de tours dans le buisson
-
+        if hasattr(unit, 'original_speed'):
+            unit.speed = unit.original_speed  # 恢复原始速度
+        unit.invisible = False
+        unit.turns_in_bush = 0
+        print(f"After remove: {unit.speed}")
+        
+        
 class Rock(Terrain):
     def __init__(self):
         super().__init__()
@@ -85,7 +92,7 @@ class Rock(Terrain):
         """Logique lorsqu'une unité quitte une case rocheuse"""
         # Ajouter une logique supplémentaire ici si nécessaire
         pass
-
+    
 class Water(Terrain):
     def __init__(self):
         super().__init__()
@@ -100,8 +107,10 @@ class Water(Terrain):
 
     def apply_effect(self, unit):
         """Méthode appelée lorsque l'unité traverse de l'eau"""
-        unit.speed *= max(1, int(unit.speed * 0.7))  # 最小速度为 1，避免速度归零, Réduit la vitesse de 30%
-        unit.turns_in_water = 0  # Initialise le nombre de tours dans l'eau
+        if not hasattr(unit, 'original_speed'):
+            unit.original_speed = unit.speed  # 存储原始速度
+        unit.speed = max(1, int(unit.original_speed * 0.5))  # 减速到原来的 50%
+        unit.turns_in_water = 0
         return True
     
     def stay_effect(self, unit):
@@ -112,5 +121,6 @@ class Water(Terrain):
 
     def remove_effect(self, unit):
         """Méthode appelée lorsque l'unité quitte l'eau"""
-        unit.speed /= 0.5  # Restaure la vitesse originale
-        unit.turns_in_water = 0  # Réinitialise le nombre de tours dans l'eau
+        if hasattr(unit, 'original_speed'):
+            unit.speed = unit.original_speed  # 恢复原始速度
+        unit.turns_in_water = 0
