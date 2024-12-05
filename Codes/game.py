@@ -76,7 +76,7 @@ class Game:
         # Collect positions of all characters to avoid terrain overlap
         occupied_positions = {(unit.x, unit.y) for unit in self.player_units + self.enemy_units}
         self.board = GameBoard(GRID_SIZE, occupied_positions)
-        self.point = Unit(0,0,"player",self)
+        self.point = Unit(0,0,"pointeur",self)
         self.point_aff = False
         
     
@@ -128,7 +128,65 @@ class Game:
         """Tour du joueur"""
     
         for selected_unit in self.player_units:
-            
+
+            # Afficher la victoire (fin de partie)
+            if len(self.enemy_units) == 0:
+                # Quitter Pygame proprement
+                pygame.mixer.music.stop()
+                pygame.quit()
+
+                # Réinitialisation de Pygame pour afficher l'écran de fin
+                pygame.init()
+                #Initialisation de la musique
+                pygame.mixer.init()
+                pygame.mixer.music.load("music/The_Bridge_of_Khazad_Dum.mp3")
+                pygame.mixer.music.play(-1)  # Joue en boucle infinie
+
+                # Instanciation de la fenêtre
+                screen = pygame.display.set_mode((1450, 750))
+                pygame.display.set_caption("Mon jeu de stratégie")
+
+                # Écran titre
+                image = pygame.image.load("images/minas_tirith.jpg")
+                # Initialiser une police pour le texte
+                font = pygame.font.Font(None, 30)  # Police par défaut, taille 30
+                text1 = font.render("Appuyez sur SPACE pour quitter le jeu", True, BLACK)
+
+                font = pygame.font.Font(None, 40)  # Police par défaut, taille 60
+                text2 = font.render("La communauté de l'anneau a battu Sauron !", True, BLACK)
+
+                # Obtenir la position centrale de l'image
+                image_rect = image.get_rect(center=(700, 600))
+
+                # Positionner le texte
+                text_rect1 = text1.get_rect(center=(950,150))
+                # Positionner le texte
+                text_rect2 = text2.get_rect(center=(950,100))
+
+                running = True
+                while running:
+                    # Gestion des événements
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_SPACE:
+                                running = False
+
+                    # Remplir l'écran avec une couleur unie (optionnel)
+                    screen.fill((0, 0, 0))  # Fond noir
+
+                    # Dessiner l'image sur l'écran
+                    screen.blit(image, image_rect)
+
+                    # Dessiner le texte sur l'écran
+                    screen.blit(text1, text_rect1)
+                    screen.blit(text2, text_rect2)
+
+                    # Mettre à jour l'affichage
+                    pygame.display.flip()
+
+                # Quitter le jeu
+                exit()
+
             # Tant que l'unité n'a pas terminé son tour
             selected_unit.is_selected = True # 标记单位为选中状态，显示移动范围
             
@@ -139,21 +197,17 @@ class Game:
             # 更新当前单位的移动范围
             selected_unit.update_move_range()
             selected_unit.draw_move_range(self.screen)#高亮能走到的范围
-            
-             # Affichage du joueur
-            font = pygame.font.Font(None, 40)
-            y_offset = 10
-            x_offset = CELL_SIZE * GRID_SIZE + 100
-            unit_status = f"C'est à {selected_unit.nom} de jouer !"
-            unit_surface = font.render(unit_status, True, WHITE)
-            self.screen.blit(unit_surface, (x_offset, y_offset))
-            # Mettre à jour l'affichage
-            #pygame.display.flip() 
+
+            #Affichage du HUD
             self.flip_display()
             
             # Si l'unité est un mage, il récupère 1 point de mana par tour
             if isinstance(selected_unit,Mage):
                 selected_unit.mana += 1
+
+            # Si l'unité est un voleur, il perd son invisibilité
+            if isinstance(selected_unit,Voleur):
+                selected_unit.is_invisible = False
 
             # Enregistrement de la position initiale de l'unité
             temp1 = selected_unit.x
@@ -162,6 +216,14 @@ class Game:
             has_acted = False # 标记该单位是否完成行动，目前没有完成行动
             
             while not has_acted:
+
+                # Affichage du joueur
+                font = pygame.font.Font(None, 40)
+                y_offset = 10
+                x_offset = CELL_SIZE * GRID_SIZE + 100
+                unit_status = f"C'est à {selected_unit.nom} de jouer !"
+                unit_surface = font.render(unit_status, True, WHITE)
+                self.screen.blit(unit_surface, (x_offset, y_offset))
               
                 if isinstance(selected_unit,Mage):
                     font = pygame.font.Font(None, 40)
@@ -322,7 +384,8 @@ class Game:
                                             choose = True
                                             target = 1
                                             special_skill = False
-                                            break  # Valide la cible
+                                            self.flip_display()
+                                            break
 
                                         # Déplace le pointeur dans la portée de 3
                                         if selected_unit.x - 3 <= self.point.x + dx <= selected_unit.x + 3 and selected_unit.y - 3 <= self.point.y + dy <= selected_unit.y + 3:
@@ -353,7 +416,7 @@ class Game:
                                             if isinstance(target,Voleur): # Vérification si la cible n'est pas invisible
                                                 if target.is_invisible:
                                                     font = pygame.font.Font(None, 40)
-                                                    error_msg = "Cette unité porte l'anneau et est invisible ! Impossible de l'attaquer !"
+                                                    error_msg = "Cette unité porte l'anneau ! Impossible de l'attaquer !"
                                                     error_surface = font.render(error_msg, True, RED)
                                                     self.screen.blit(error_surface, (CELL_SIZE * GRID_SIZE + 100, 100))
                                                     pygame.display.flip()
@@ -383,7 +446,7 @@ class Game:
                                 selected_unit.miss = False
                                 selected_unit.critique = False
 
-                            if selected_unit.critique and not selected_unit.miss:
+                            elif selected_unit.critique:
                                 font = pygame.font.Font(None, 40)
                                 y_offset = CELL_SIZE * target.y
                                 x_offset = CELL_SIZE * target.x
@@ -447,7 +510,7 @@ class Game:
                                 selected_unit.miss = False
                                 selected_unit.critique = False
 
-                            if selected_unit.critique and not selected_unit.miss:
+                            elif selected_unit.critique:
                                 font = pygame.font.Font(None, 40)
                                 y_offset = CELL_SIZE * self.point.y
                                 x_offset = CELL_SIZE * self.point.x
@@ -458,13 +521,16 @@ class Game:
                                 pygame.display.flip()
                                 pygame.time.wait(1000)
                                 selected_unit.critique = False
-
-                        for enemy in self.enemy_units:
-                            if enemy.health <= 0:
-                                self.enemy_units.remove(enemy)
+                                self.flip_display()
                         
-                        self.flip_display()
-                    # 重置选择状态
+            #suppression des unités éliminées
+            for enemy in self.enemy_units:
+                if enemy.health <= 0:
+                    self.enemy_units.remove(enemy)
+            
+            for unit in self.player_units:
+                if unit.health <= 0:
+                    self.player_units.remove(unit)
             
             selected_unit.is_selected = False
             self.flip_display()
@@ -501,10 +567,10 @@ class Game:
             dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
             
             
-            # 检查目标位置是否已被其他单位占据
+            #检查目标位置是否已被其他单位占据
             new_x, new_y = enemy.x + dx, enemy.y + dy
             # 使用is_occupied方法检查该位置是否被占用
-            if not self.is_occupied(new_x, new_y):  
+            if not self.is_occupied(new_x, new_y):
                 enemy.move(dx, dy)
 
                 # 重新应用移动后的地形效果
@@ -558,15 +624,6 @@ class Game:
 
         # Affiche le HUD
         self.draw_hud()
-
-        # Afficher la victoire (à coder, ça ne marche pas)
-        if len(self.enemy_units) == 0:
-            font = pygame.font.Font(None, 40)
-            y_offset = CELL_SIZE * GRID_SIZE + 500
-            x_offset = CELL_SIZE * GRID_SIZE + 100
-            unit_status = f"Bravo ! La Communauté de l'anneau a vaincu Sauron !"
-            unit_surface = font.render(unit_status, True, RED)
-            self.screen.blit(unit_surface, (x_offset, y_offset))
 
         # Rafraîchit l'écran
         pygame.display.flip()
@@ -633,7 +690,7 @@ def main():
 
 
     # Initialisation de Pygame
-    screen = pygame.display.set_mode((GRID_SIZE * CELL_SIZE * 1.8, GRID_SIZE * CELL_SIZE))
+    screen = pygame.display.set_mode((GRID_SIZE * CELL_SIZE * 2, GRID_SIZE * CELL_SIZE))
     pygame.display.set_caption("Mon jeu de stratégie")
     pygame.init()
 

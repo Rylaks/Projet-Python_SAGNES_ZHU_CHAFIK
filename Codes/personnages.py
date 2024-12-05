@@ -1,6 +1,14 @@
 from skills import *
 from unit import *
 
+from abc import ABC, abstractmethod
+
+class Personnage(ABC):
+
+    @abstractmethod
+    def draw(self,screen):
+        pass
+
 class Mage(Unit,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers et vie faibles
     """
     Type d'unité mage
@@ -38,21 +46,15 @@ class Mage(Unit,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers e
         else:
             raise TypeError ("La team doit être - player - ou - enemy - !")
         
-        # Charger les images
-        self.image = pygame.image.load(
-            "images/gandalf.png" if team == "player" else "images/saroumane.png"
-        )
-        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
+    #Charger les images
+    def draw(self,screen):
+        if self.team == "player":
+            image_path = "images/gandalf.png"
+        elif self.team == "enemy":
+            image_path = "images/Saroumane.png"
 
-    def draw(self, screen):
-        """Affiche l'unité sur l'écran avec une image."""
-        if self.is_selected:
-            # Ajouter une bordure blanche si l'unité est sélectionnée
-            pygame.draw.rect(
-                screen, WHITE,
-                (self.x * CELL_SIZE, self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE),
-                2  # Épaisseur de la bordure
-            )
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
         # Dessiner l'image correspondant à l'unité
         screen.blit(self.image, (self.x * CELL_SIZE, self.y * CELL_SIZE))
     
@@ -94,21 +96,15 @@ class Voleur(Unit,Skills):    #Voleur: vitesse grande, attaque faible, boucliers
         else:
             raise TypeError ("La team doit être - player - ou - enemy - !")
         
-# Charger les images
-        self.image = pygame.image.load(
-            "images/bilbon.png" if team == "player" else "images/gollum.png"
-        )
-        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
+    #Charger les images
+    def draw(self,screen):
+        if self.team == "player":
+            image_path = "images/Bilbon.png"
+        elif self.team == "enemy":
+            image_path = "images/gollum.png"
 
-    def draw(self, screen):
-        """Affiche l'unité sur l'écran avec une image."""
-        if self.is_selected:
-            # Ajouter une bordure blanche si l'unité est sélectionnée
-            pygame.draw.rect(
-                screen, WHITE,
-                (self.x * CELL_SIZE, self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE),
-                2  # Épaisseur de la bordure
-            )
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
         # Dessiner l'image correspondant à l'unité
         screen.blit(self.image, (self.x * CELL_SIZE, self.y * CELL_SIZE))
 
@@ -150,19 +146,13 @@ class Guerrier(Unit,Skills):    #Guerrier: vitesse faible, attaque grandes, bouc
             raise TypeError ("La team doit être - player - ou - enemy - !")
         
     # Charger les images
-        self.image = pygame.image.load(
-            "images/aragorn.jpg" if team == "player" else "images/Angmar.png"
-        )
-        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
+    def draw(self,screen):
+        if self.team == "player":
+            image_path = "images/aragorn.jpg"
+        elif self.team == "enemy":
+            image_path = "images/Angmar.png"
 
-    def draw(self, screen):
-        """Affiche l'unité sur l'écran avec une image."""
-        if self.is_selected:
-            # Ajouter une bordure blanche si l'unité est sélectionnée
-            pygame.draw.rect(
-                screen, WHITE,
-                (self.x * CELL_SIZE, self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE),
-                2  # Épaisseur de la bordure
-            )
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
         # Dessiner l'image correspondant à l'unité
         screen.blit(self.image, (self.x * CELL_SIZE, self.y * CELL_SIZE))

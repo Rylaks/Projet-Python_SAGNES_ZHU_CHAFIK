@@ -2,7 +2,7 @@ import pygame
 import random
 
 # Constantes
-GRID_SIZE = 10
+GRID_SIZE = 9
 CELL_SIZE = 80
 WIDTH = GRID_SIZE * CELL_SIZE
 HEIGHT = GRID_SIZE * CELL_SIZE
@@ -50,7 +50,7 @@ class Unit:
         """
         self.x = x
         self.y = y
-        self.team = team #'player' ou 'enemy'
+        self.team = team #'player' ou 'enemy' ou 'pointeur'
         self.__is_selected = False
         self.game = game # 引用游戏实例以访问其他游戏元素
         self.green_cases = []
@@ -64,29 +64,43 @@ class Unit:
         new_x = int(self.x + dx)
         new_y = int(self.y + dy)
         
-         # 检查是否在允许的移动范围内
-        if (new_x, new_y) not in self.green_cases:
-            print(f"Movement to ({new_x}, {new_y}) is out of allowed range.")
-            return  # 如果不在允许的范围内，不进行移动
-        
-        if 0 <= new_x < GRID_SIZE and 0 <= new_y < GRID_SIZE:
-            
-            # mise a jour le type de terrain
-            old_terrain = self.game.board.grid[self.y][self.x]
-            new_terrain = self.game.board.grid[new_y][new_x]
-
-            # 检查地形是否允许移动
-            can_move = new_terrain.apply_effect(self)
-            print(f"Trying to move to ({new_x}, {new_y}) - Move allowed: {can_move}")
-
-            # Check if the terrain allows movement
-            if can_move: # Mise à jour de la position si le mouvement est autorisé
-                old_terrain.remove_effect(self)
+        #Ne pas toucher! Pour que le pointeur bouge
+        if self.team == 'pointeur':
+            if 0 <= new_x < GRID_SIZE and 0 <= new_y < GRID_SIZE:
                 self.x = new_x
                 self.y = new_y
-                print("Unit moved to:", new_x, new_y)
-            else:
-                print("Movement blocked by terrain at:", new_x, new_y)
+
+
+        #IA très basique
+        elif self.team == 'enemy':
+            if 0 <= new_x < GRID_SIZE and 0 <= new_y < GRID_SIZE:
+                self.x = new_x
+                self.y = new_y
+
+        else:
+            # 检查是否在允许的移动范围内
+            if (new_x, new_y) not in self.green_cases:
+                print(f"Movement to ({new_x}, {new_y}) is out of allowed range.")
+                return  # 如果不在允许的范围内，不进行移动
+            
+            if 0 <= new_x < GRID_SIZE and 0 <= new_y < GRID_SIZE:
+                
+                # mise a jour le type de terrain
+                old_terrain = self.game.board.grid[self.y][self.x]
+                new_terrain = self.game.board.grid[new_y][new_x]
+
+                # 检查地形是否允许移动
+                can_move = new_terrain.apply_effect(self)
+                print(f"Trying to move to ({new_x}, {new_y}) - Move allowed: {can_move}")
+
+                # Check if the terrain allows movement
+                if can_move: # Mise à jour de la position si le mouvement est autorisé
+                    old_terrain.remove_effect(self)
+                    self.x = new_x
+                    self.y = new_y
+                    print("Unit moved to:", new_x, new_y)
+                else:
+                    print("Movement blocked by terrain at:", new_x, new_y)
 
     def update_move_range(self):
         self.green_cases = [] # 清空旧的移动范围
