@@ -3,13 +3,13 @@ from unit import *
 
 from abc import ABC, abstractmethod
 
-class Personnage(ABC):
+class Personnage(ABC,Unit):
 
     @abstractmethod
     def draw(self,screen):
         pass
 
-class Mage(Unit,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers et vie faibles
+class Mage(Personnages,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers et vie faibles
     """
     Type d'unité mage
 
@@ -59,7 +59,7 @@ class Mage(Unit,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers e
         screen.blit(self.image, (self.x * CELL_SIZE, self.y * CELL_SIZE))
     
 
-class Voleur(Unit,Skills):    #Voleur: vitesse grande, attaque faible, boucliers et vie moyennes
+class Voleur(Personnages,Skills):    #Voleur: vitesse grande, attaque faible, boucliers et vie moyennes
     """
     Type d'unité voleur
 
@@ -109,7 +109,7 @@ class Voleur(Unit,Skills):    #Voleur: vitesse grande, attaque faible, boucliers
         screen.blit(self.image, (self.x * CELL_SIZE, self.y * CELL_SIZE))
 
     
-class Guerrier(Unit,Skills):    #Guerrier: vitesse faible, attaque grandes, boucliers et vie importants
+class Guerrier(Personnages,Skills):    #Guerrier: vitesse faible, attaque grandes, boucliers et vie importants
     """
     Type d'unité guerrier
 

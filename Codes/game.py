@@ -694,6 +694,8 @@ def main():
     pygame.display.set_caption("Mon jeu de stratégie")
     pygame.init()
 
+    print(type(screen))
+
     #Initialisation de la musique
     pygame.mixer.init()
     pygame.mixer.music.load("music/The_Battle_of_the_Pelennor_Fields.mp3")

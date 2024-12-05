@@ -135,9 +135,7 @@ class Unit:
         for green_x, green_y in self.green_cases:
             # 用绿色高亮显示可以移动到的格子
             pygame.draw.rect(screen, GREEN, (green_x * CELL_SIZE, green_y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)    
-         
-                                    
-    
+
             
     @property
     def is_selected(self):
