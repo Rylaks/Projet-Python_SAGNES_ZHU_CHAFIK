@@ -9,7 +9,7 @@ class Personnage(ABC,Unit):
     def draw(self,screen):
         pass
 
-class Mage(Personnages,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers et vie faibles
+class Mage(Personnage,Skills):    #Mage: vitesse moyenne, attaque elevée, boucliers et vie faibles
     """
     Type d'unité mage
 
@@ -59,7 +59,7 @@ class Mage(Personnages,Skills):    #Mage: vitesse moyenne, attaque elevée, bouc
         screen.blit(self.image, (self.x * CELL_SIZE, self.y * CELL_SIZE))
     
 
-class Voleur(Personnages,Skills):    #Voleur: vitesse grande, attaque faible, boucliers et vie moyennes
+class Voleur(Personnage,Skills):    #Voleur: vitesse grande, attaque faible, boucliers et vie moyennes
     """
     Type d'unité voleur
 
@@ -109,7 +109,7 @@ class Voleur(Personnages,Skills):    #Voleur: vitesse grande, attaque faible, bo
         screen.blit(self.image, (self.x * CELL_SIZE, self.y * CELL_SIZE))
 
     
-class Guerrier(Personnages,Skills):    #Guerrier: vitesse faible, attaque grandes, boucliers et vie importants
+class Guerrier(Personnage,Skills):    #Guerrier: vitesse faible, attaque grandes, boucliers et vie importants
     """
     Type d'unité guerrier
 
