@@ -63,14 +63,15 @@ class Skills:
             for u in unit:  # Parcours des unités
                 if pointeur_x + dx == u.x and pointeur_y + dy == u.y:
                     list_unit_trouvees.append(u)
-        
+
+        p1 = random.random()
+        p2 = random.random()
+        if p1 < 0.2: #20% de chances de coup critique
+            self.critique = True
+        if p2 < 0.1: #10% de chances de rater
+            self.miss = True
+            
         for target in list_unit_trouvees:
-            p1 = random.random()
-            p2 = random.random()
-            if p1 < 0.2: #20% de chances de coup critique
-                self.critique = True
-            if p2 < 0.1: #10% de chances de rater
-                self.miss = True
             if self.miss:
                 print("Coup raté !")
             elif not self.critique :
