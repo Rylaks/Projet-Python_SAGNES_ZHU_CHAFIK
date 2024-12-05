@@ -5,6 +5,9 @@ from abc import ABC, abstractmethod
 
 class Personnage(ABC,Unit):
 
+    def __init__(self, x, y, team, game):
+        super().__init__(x,y,team,game)
+
     @abstractmethod
     def draw(self,screen):
         pass
@@ -29,7 +32,7 @@ class Mage(Personnage,Skills):    #Mage: vitesse moyenne, attaque elevée, boucl
         Vitesse de l'unité.
     """
     def __init__(self,x ,y, team,game):
-        Unit.__init__(self,x,y,team,game)
+        Personnage.__init__(self,x,y,team,game)
         Skills.__init__(self)
         self.health = 10
         self.mana = 9 #commencera la partie avec 10 car en obtient 1 à chaque tour.
@@ -79,7 +82,7 @@ class Voleur(Personnage,Skills):    #Voleur: vitesse grande, attaque faible, bou
         Vitesse de l'unité.
     """
     def __init__(self,x ,y, team,game):
-        Unit.__init__(self,x,y,team,game)
+        Personnage.__init__(self,x,y,team,game)
         Skills.__init__(self)
         self.health = 10
         self.attack_power = 5
@@ -129,7 +132,7 @@ class Guerrier(Personnage,Skills):    #Guerrier: vitesse faible, attaque grandes
         Vitesse de l'unité.
     """
     def __init__(self,x ,y, team,game):
-        Unit.__init__(self,x,y,team,game)
+        Personnage.__init__(self,x,y,team,game)
         Skills.__init__(self)
         self.health = 30
         self.attack_power = 10
