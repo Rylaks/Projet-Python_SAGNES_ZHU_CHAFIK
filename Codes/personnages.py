@@ -7,6 +7,8 @@ class Personnage(ABC,Unit):
 
     def __init__(self, x, y, team, game):
         super().__init__(x,y,team,game)
+        self.turns_in_water = 0  # 初始化在水中的回合数
+        self.turns_in_bush = 0   # 初始化在灌木中的回合数
 
     @abstractmethod
     def draw(self,screen):
@@ -40,8 +42,6 @@ class Mage(Personnage,Skills):    #Mage: vitesse moyenne, attaque elevée, boucl
         self.defense_shield = 3
         self.speed = 3
         self.original_speed = self.speed
-        self.turns_in_water = 0  # 初始化在水中的回合数
-        self.turns_in_bush = 0   # 初始化在灌木中的回合数
         if team == "player":
             self.nom = "Gandalf le Gris"
         elif team == "enemy":
@@ -90,8 +90,6 @@ class Voleur(Personnage,Skills):    #Voleur: vitesse grande, attaque faible, bou
         self.defense_shield = 7
         self.speed = 5
         self.original_speed = self.speed
-        self.turns_in_water = 0  # 初始化在水中的回合数
-        self.turns_in_bush = 0   # 初始化在灌木中的回合数
         if team == "player":
             self.nom = "Bilbon"
         elif team == "enemy":
@@ -139,8 +137,6 @@ class Guerrier(Personnage,Skills):    #Guerrier: vitesse faible, attaque grandes
         self.defense_shield = 10
         self.speed = 2
         self.original_speed = self.speed
-        self.turns_in_water = 0  # 初始化在水中的回合数
-        self.turns_in_bush = 0   # 初始化在灌木中的回合数
         if team == "player":
             self.nom = "Aragorn"
         elif team == "enemy":
