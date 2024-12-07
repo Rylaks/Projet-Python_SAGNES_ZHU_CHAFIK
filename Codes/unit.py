@@ -24,30 +24,25 @@ class Unit:
         La position x de l'unité sur la grille.
     y : int
         La position y de l'unité sur la grille.
+    team : str
+        L'équipe de l'unité ('player' ou 'enemy' ou 'pointeur').
     is_selected : bool
         Si l'unité est sélectionnée ou non.
+    game : Game
+        Jeu Pygame.
 
     Méthodes
     --------
     move(dx, dy)
         Déplace l'unité de dx, dy.
-    draw(screen)
-        Dessine l'unité sur la grille.
+    update_move_range()
+        met à jour la range.
+    draw_move_range()
+        dessine la range.
+    
     """
 
     def __init__(self, x, y, team,game):
-        """
-        Construit un unité avec une position, et une team.
-
-        Paramètres
-        ----------
-        x : int
-            La position x de l'unité sur la grille.
-        y : int
-            La position y de l'unité sur la grille.
-        team : str
-            L'équipe de l'unité ('player' ou 'enemy').
-        """
         self.x = x
         self.y = y
         self.team = team #'player' ou 'enemy' ou 'pointeur'

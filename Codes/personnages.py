@@ -4,6 +4,13 @@ from unit import *
 from abc import ABC, abstractmethod
 
 class Personnage(ABC,Unit):
+    """
+    Classe abstraite pour représenter un personnage.
+
+    Méthodes :
+    draw(screen) (abstract)
+        dessine une unité sur l'écran.
+    """
 
     def __init__(self, x, y, team, game):
         super().__init__(x,y,team,game)
@@ -18,20 +25,25 @@ class Mage(Personnage,Skills):    #Mage: vitesse moyenne, attaque elevée, boucl
     """
     Type d'unité mage
 
-    Paramètres
+    Attributs
     ----------
-    x : int
-        La position x de l'unité sur la grille.
-    y : int
-        La position y de l'unité sur la grille.
     health : int
         La santé de l'unité.
+    mana : int
+        La quantité de mana de l'unité
     attack_power : int
         La puissance d'attaque de l'unité.
     defense_shield : int
         Le bouclier de l'unité.
     speed : int
-        Vitesse de l'unité.
+        Vitesse actuelle de l'unité.
+    original_speed : int
+        Vitesse intrinsèque de l'unité.
+
+    Méthodes
+    ----------
+    draw(screen)
+        dessine une unité sur l'écran.
     """
     def __init__(self,x ,y, team,game):
         Personnage.__init__(self,x,y,team,game)
@@ -66,20 +78,25 @@ class Voleur(Personnage,Skills):    #Voleur: vitesse grande, attaque faible, bou
     """
     Type d'unité voleur
 
-    Paramètres
+    Attributs
     ----------
-    x : int
-        La position x de l'unité sur la grille.
-    y : int
-        La position y de l'unité sur la grille.
     health : int
         La santé de l'unité.
     attack_power : int
         La puissance d'attaque de l'unité.
+    is_invisible : bool
+        État de l'unité.
     defense_shield : int
         Le bouclier de l'unité.
     speed : int
-        Vitesse de l'unité.
+        Vitesse actuelle de l'unité.
+    original_speed : int
+        Vitesse intrinsèque de l'unité.
+
+    Méthodes
+    ----------
+    draw(screen)
+        dessine une unité sur l'écran.
     """
     def __init__(self,x ,y, team,game):
         Personnage.__init__(self,x,y,team,game)
@@ -114,12 +131,8 @@ class Guerrier(Personnage,Skills):    #Guerrier: vitesse faible, attaque grandes
     """
     Type d'unité guerrier
 
-    Paramètres
+    Attributs
     ----------
-    x : int
-        La position x de l'unité sur la grille.
-    y : int
-        La position y de l'unité sur la grille.
     health : int
         La santé de l'unité.
     attack_power : int
@@ -128,6 +141,13 @@ class Guerrier(Personnage,Skills):    #Guerrier: vitesse faible, attaque grandes
         Le bouclier de l'unité.
     speed : int
         Vitesse de l'unité.
+    original_speed : int
+        Vitesse intrinsèque de l'unité.
+
+    Méthodes
+    ----------
+    draw(screen)
+        dessine une unité sur l'écran.
     """
     def __init__(self,x ,y, team,game):
         Personnage.__init__(self,x,y,team,game)

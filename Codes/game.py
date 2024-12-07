@@ -51,6 +51,8 @@ class Game:
         La liste des unités du joueur.
     enemy_units : list[Unit]
         La liste des unités de l'adversaire.
+    points : Unit
+        Représente le pointeur pour sélectionner des cibles
     """
 
     def __init__(self, screen):
@@ -580,7 +582,13 @@ class Game:
             
             # Attaque si possible
             if abs(enemy.x - target.x) <= 1 and abs(enemy.y - target.y) <= 1:
-                enemy.attack(target)
+                if isinstance(target,Voleur):
+                    if target.is_invisible :
+                        pass
+                    else:
+                        enemy.attack(target)
+                else:
+                    enemy.attack(target)
                 if target.health < 0:
                     self.player_units.remove(target)
 
@@ -611,7 +619,7 @@ class Game:
 
         # Affiche le pointeur
         if self.point_aff:
-            pygame.draw.rect(self.screen, GREEN, (self.point.x * CELL_SIZE,
+            pygame.draw.rect(self.screen, RED, (self.point.x * CELL_SIZE,
                             self.point.y * CELL_SIZE, CELL_SIZE, CELL_SIZE),width=5)
             font = pygame.font.Font(None, 30)
             red = (255, 0, 0)

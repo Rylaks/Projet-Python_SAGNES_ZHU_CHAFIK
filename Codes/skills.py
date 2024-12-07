@@ -2,7 +2,30 @@ import random   #probabilité de coup critique et de précision
 from unit import *
 
 class Skills:
+    """
+    Classe rassemblant les méthodes des compétences que chaque unité peuvent jouer
+
+    Attributs
+    -----------
+    critique : bool
+        Indique si le coup est critique
+    miss : bool
+        Indique si le coup est manqué
+
+    Méthodes
+    ----------
+    attack(target)
+        Attaque au corps à corps la target
     
+    heal(target)
+        Soigne une unité
+    fire_ball(pointeur, x_pointeur, y_pointeur)
+        Lance une boule de feu avec une zone d'effet de neuf cases
+    invisibility()
+        Rend l'unité invisible
+    bow(target)
+        Tir à l'arc sur la target
+    """
     def __init__(self):
         self.critique = False
         self.miss = False
@@ -95,10 +118,11 @@ class Skills:
             Ne peut pas non plus se faire soigner par le mage !"""
         #coûte des points de bouclier (ça fatigue!), puis des points de vie quand le bouclier est à 0.
         self.is_invisible = True
-        if self.defense_shield > 0:
+        if self.defense_shield >= 3:
             self.defense_shield -= 3
         else:
-            self.health -= 3
+            self.health -= 3 - self.defense_shield
+            self.defense_shield = 0
 
 
     #pour les guerriers:       
