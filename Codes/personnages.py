@@ -54,6 +54,8 @@ class Mage(Personnage,Skills):    #Mage: vitesse moyenne, attaque elevée, boucl
         self.defense_shield = 3
         self.speed = 3
         self.original_speed = self.speed
+        
+        self.attack_range_skill = 2
         if team == "player":
             self.nom = "Gandalf le Gris"
         elif team == "enemy":
@@ -157,6 +159,8 @@ class Guerrier(Personnage,Skills):    #Guerrier: vitesse faible, attaque grandes
         self.defense_shield = 10
         self.speed = 2
         self.original_speed = self.speed
+        self.attack_range_skill = 3
+       
         if team == "player":
             self.nom = "Aragorn"
         elif team == "enemy":

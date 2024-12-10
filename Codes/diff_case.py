@@ -4,22 +4,25 @@ from unit import CELL_SIZE
 from personnages import Guerrier
 
 
-class Terrain:
+class Terrain():
     def __init__(self):
         self.visible = True  # visibilité
         
          # Définit une image par défaut pour Terrain
         self.image = pygame.Surface((CELL_SIZE, CELL_SIZE))  # Crée une surface de base
         self.image.fill((100, 100, 100))  # Colore la surface en gris par défaut
-
+    
+    
     def stay_effect(self, unit):
         """Appliquer l'effet du terrain à l'unité, implémenté dans les sous-classes"""
         pass
     
+    
     def apply_effect(self, unit):
         """Appliquer l'effet du terrain à l'unité, implémenté dans les sous-classes"""
         return True
-
+    
+    
     def remove_effect(self, unit):
         """Retirer l'effet du terrain sur l'unité, s'il y a un effet persistant"""
         pass
@@ -44,9 +47,9 @@ class Bush(Terrain):
         if not hasattr(unit, 'original_speed'):
             unit.original_speed = unit.speed  # 存储原始速度
         unit.invisible = True  # 隐身
-        print(f"Before apply: {unit.speed}")
+        
         unit.speed = unit.original_speed * 2  # 双倍速度
-        print(f"After apply: {unit.speed}")
+       
 
         unit.turns_in_bush = 0  # 初始化在草地的回合数
         return True

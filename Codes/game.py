@@ -14,9 +14,9 @@ class GameBoard:
         self.grid = [[Terrain() for _ in range(size)] for _ in range(size)]
         
         # Place bushes, rocks, and water avoiding character positions
-        self.place_terrain(Bush, random.randint(1, 3),occupied_positions)
-        self.place_terrain(Rock, random.randint(1, 5),occupied_positions)
-        self.place_terrain(Water, random.randint(1, 3),occupied_positions)
+        self.place_terrain(Bush, random.randint(10, 20),occupied_positions)
+        self.place_terrain(Rock, random.randint(10, 20),occupied_positions)
+        self.place_terrain(Water, random.randint(10, 20),occupied_positions)
         
         
         
@@ -280,8 +280,8 @@ class Game:
                 for event in pygame.event.get():
 
                     attack = False
-                    special_skill = False
-                    special_skill_2 = False
+                    self.special_skill = False
+                    self.special_skill2 = False
                     no_action = False
 
                     # Gestion de la fermeture de la fenêtre
@@ -308,9 +308,9 @@ class Game:
                         elif event.key == pygame.K_2:
                             attack = True
                         elif event.key == pygame.K_3:
-                            special_skill = True
+                            self.special_skill = True
                         elif event.key == pygame.K_4:
-                            special_skill_2 = True
+                            self.special_skill2 = True
 
                         
                         #获取新位置
@@ -353,20 +353,22 @@ class Game:
 
                         elif isinstance(selected_unit,Voleur):
                             selected_unit.is_invisible = False
-                            if special_skill:
+                            if self.special_skill:
                                 selected_unit.invisibility()
                                 has_acted = True
                                 selected_unit.is_selected = False
 
 
                         #Sélection d'une cible
-                        elif special_skill:
+                        elif self.special_skill:
                             target = None
                             choose = False
                             self.point.x, self.point.y = selected_unit.x, selected_unit.y  # Centrez le pointeur sur l'unité
+                            self.point.init_x, self.point.init_y = selected_unit.x, selected_unit.y  # Centrez le pointeur sur l'unité
                             while not choose and target is None:
                                 self.point_aff = True
                                 self.flip_display() #affichage du pointeur
+                                
                                 for event in pygame.event.get():
 
                                     if event.type == pygame.KEYDOWN:
@@ -385,14 +387,16 @@ class Game:
                                             self.point_aff = False
                                             choose = True
                                             target = 1
-                                            special_skill = False
+                                            self.special_skill = False
                                             self.flip_display()
                                             break
-
+                                            
                                         # Déplace le pointeur dans la portée de 3
                                         if selected_unit.x - 3 <= self.point.x + dx <= selected_unit.x + 3 and selected_unit.y - 3 <= self.point.y + dy <= selected_unit.y + 3:
-                                            self.point.move(dx, dy)
+                                            self.point.move(dx,dy)
                                             self.flip_display()
+                                            
+                                            
                                         
                                         if choose:
                                             self.point_aff = False
@@ -426,10 +430,10 @@ class Game:
                                                     target = None
                                                     choose = False
                                     
-                            if special_skill and isinstance(selected_unit,Guerrier):
+                            if self.special_skill and isinstance(selected_unit,Guerrier):
                                 selected_unit.bow(target)
                                 has_acted = True
-                            if special_skill and isinstance(selected_unit,Mage):
+                            if self.special_skill and isinstance(selected_unit,Mage):
                                 selected_unit.heal(target) #Peut accumuler des manas à tous les tours pour les utiliser d'un coup sur quelqu'un
                                 has_acted = True
                                 selected_unit.is_selected = False
@@ -460,10 +464,11 @@ class Game:
                                 pygame.time.wait(1000)
                                 selected_unit.critique = False
 
-                        elif special_skill_2 and isinstance(selected_unit,Mage):
+                        elif self.special_skill2 and isinstance(selected_unit,Mage):
                             target = None
                             choose = False
                             self.point.x, self.point.y = selected_unit.x, selected_unit.y
+                            self.point.init_x, self.point.init_y = selected_unit.x, selected_unit.y  # Centrez le pointeur sur l'unité
                             while not choose and target is None:
                                 self.point_aff = True
                                 self.flip_display() #affichage du pointeur
@@ -485,7 +490,7 @@ class Game:
                                             self.point_aff = False
                                             choose = True
                                             target = 1
-                                            special_skill_2 = False
+                                            self.special_skill2 = False
                                             break  # Valide la cible
 
                                         # Déplace le pointeur dans la portée de 2
@@ -493,7 +498,7 @@ class Game:
                                             self.point.move(dx, dy)
                                             self.flip_display()
                                         
-                                        if choose and special_skill_2:
+                                        if choose and self.special_skill2:
                                             self.point_aff = False
                                             selected_unit.fire_ball(self.point.x, self.point.y, self.player_units + self.enemy_units)
                                             has_acted = True
@@ -629,6 +634,42 @@ class Game:
             self.screen.blit(info_surface, (CELL_SIZE * GRID_SIZE + 100, 10))
             info_surface = font.render(info2, True, WHITE)
             self.screen.blit(info_surface, (CELL_SIZE * GRID_SIZE + 200, 40))
+            
+            if self.special_skill:
+                case_yellow = []
+                for dx in range(-3,4):
+                    for dy in range(-3,4):
+                        
+                        rect_x = self.point.init_x + dx
+                        rect_y = self.point.init_y + dy
+                        case_yellow.append((rect_x,rect_y))
+                
+                for rect_x, rect_y in case_yellow:
+                    pygame.draw.rect(self.screen, YELLOW, (rect_x * CELL_SIZE, rect_y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)
+                    
+            if self.special_skill2:
+                case_yellow = []
+                for dx in range(-2,3):
+                    for dy in range(-2,3):
+                        
+                        rect_x = self.point.init_x + dx
+                        rect_y = self.point.init_y + dy
+                        case_yellow.append((rect_x,rect_y))
+                
+                for rect_x, rect_y in case_yellow:
+                    pygame.draw.rect(self.screen, YELLOW, (rect_x * CELL_SIZE, rect_y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)
+                    
+                case_yellow = []
+                for dx in range(-1,2):
+                    for dy in range(-1,2):
+                        
+                        rect_x = self.point.x + dx
+                        rect_y = self.point.y + dy
+                        case_yellow.append((rect_x,rect_y))
+                
+                for rect_x, rect_y in case_yellow:
+                    pygame.draw.rect(self.screen, (255, 165, 0), (rect_x * CELL_SIZE, rect_y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)
+                
 
         # Affiche le HUD
         self.draw_hud()

@@ -2,8 +2,8 @@ import pygame
 import random
 
 # Constantes
-GRID_SIZE = 9
-CELL_SIZE = 80
+GRID_SIZE = 18
+CELL_SIZE = 45
 WIDTH = GRID_SIZE * CELL_SIZE
 HEIGHT = GRID_SIZE * CELL_SIZE
 FPS = 30
@@ -12,6 +12,7 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
+YELLOW = (0,255,255)
 
 class Unit:
     """
@@ -49,6 +50,7 @@ class Unit:
         self.__is_selected = False
         self.game = game # 引用游戏实例以访问其他游戏元素
         self.green_cases = []
+        self.red_cases = []
         
     
   
@@ -99,7 +101,6 @@ class Unit:
 
     def update_move_range(self):
         self.green_cases = [] # 清空旧的移动范围
-        
         start_x, start_y = self.x, self.y  # 获取当前单位的位置
         speed = int(self.speed)
         print(f"Speed: {speed}, Position: ({self.x}, {self.y})")  # 打印速度和位置
@@ -123,15 +124,14 @@ class Unit:
                         if terrain.apply_effect(self):
                             self.green_cases.append((green_x, green_y))
         
-        print(f"{self.nom}'s move range updated: {self.green_cases}")
-     
-     
+   
     def draw_move_range(self, screen):
         for green_x, green_y in self.green_cases:
             # 用绿色高亮显示可以移动到的格子
             pygame.draw.rect(screen, GREEN, (green_x * CELL_SIZE, green_y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)    
-
-            
+    
+    
+   
     @property
     def is_selected(self):
         return self.__is_selected
