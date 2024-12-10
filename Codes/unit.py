@@ -141,4 +141,14 @@ class Unit:
         if not isinstance(value, bool):
             raise ValueError("is_selected doit être un booléen")
         self.__is_selected = value
+
+
+    image_chemins = {
+        "Bilbon": "images/Bilbon.png",
+        "Gollum": "images/gollum.png",
+        "Le Roi-Sorcier d'Angmar": "images/Angmar.png",
+        "Aragorn": "images/aragorn.jpg",
+        "Gandalf le Gris": "images/gandalf.png",
+        "Saroumane le Blanc": "images/Saroumane.png",
+    }
         

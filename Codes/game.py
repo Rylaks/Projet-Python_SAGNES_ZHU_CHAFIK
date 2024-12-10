@@ -2,7 +2,9 @@
 import pygame
 import random
 
+
 from unit import *
+from unit import GRID_SIZE, Unit, HEIGHT, WHITE, BLACK, RED, WIDTH, YELLOW 
 from personnages import *
 from skills import *
 from unit import *
@@ -88,41 +90,132 @@ class Game:
                 return True
         return False
 
-        
+
+    
+
+
+
+  
     def draw_hud(self):
-        """Affiche les informations du HUD."""
+        """Affiche un HUD stylé avec des barres de vie et des sections bien organisées."""
 
-        # Couleur et police pour le texte
-        font = pygame.font.Font(None, 25)
+        # Couleurs
+        BG_COLOR = (30, 30, 30)  # Fond du HUD
+        BORDER_COLOR = (200, 200, 200)  # Bordure du HUD
+        HEALTH_COLOR = (0, 200, 0)  # Couleur des PV
+        SHIELD_COLOR = (0, 100, 255)  # Couleur du bouclier
+        MANA_COLOR = (150, 0, 200)  # Couleur de la barre de mana (pour les mages)
 
-        # Afficher les informations des unités (joueur)
-        y_offset = CELL_SIZE * GRID_SIZE / 2
-        x_offset = CELL_SIZE * GRID_SIZE + 100
-        unit_info = f"Statistiques (joueur 1):"
-        unit_surface = font.render(unit_info, True, WHITE)
-        self.screen.blit(unit_surface, (x_offset, y_offset))
-        y_offset += 20
-        for unit in self.player_units:
-            if isinstance(unit, Mage):
-                unit_info = f" - {unit.nom}: PV = {unit.health}, Bouclier = {unit.defense_shield}, mana = {unit.mana}"
-            else:
-                unit_info = f" - {unit.nom}: PV = {unit.health}, Bouclier = {unit.defense_shield}"
-            unit_surface = font.render(unit_info, True, WHITE)
-            self.screen.blit(unit_surface, (x_offset, y_offset))
-            y_offset += 20
+        # Dimensions et positions
+        hud_x = CELL_SIZE * GRID_SIZE + 20
+        hud_y = 50
+        hud_width = 600
+        hud_height = HEIGHT - 100
+        padding = 10
 
-        y_offset += 20
-        unit_info = f"Statistiques (joueur 2):"
-        unit_surface = font.render(unit_info, True, WHITE)
-        self.screen.blit(unit_surface, (x_offset, y_offset))
-        # Afficher les informations des unités (ennemi)
-        y_offset += 20  # Séparateur
-        for unit in self.enemy_units:
-            unit_info = f" - {unit.nom} : PV = {unit.health}, Bouclier = {unit.defense_shield}"
-            unit_surface = font.render(unit_info, True, WHITE)
-            self.screen.blit(unit_surface, (x_offset, y_offset))
-            y_offset += 20
-        
+        # Dessiner le fond du HUD
+        pygame.draw.rect(self.screen, BG_COLOR, (hud_x, hud_y, hud_width, hud_height))
+        pygame.draw.rect(self.screen, BORDER_COLOR, (hud_x, hud_y, hud_width, hud_height), 3)  # Bordure
+
+        # Titre du HUD
+        font_title = pygame.font.Font("/police/police.TTF", 35)
+        font_body = pygame.font.Font("/police/police.TTF", 25)
+        title_surface = font_title.render("Informations", True, WHITE)
+        self.screen.blit(title_surface, (hud_x + padding, hud_y + padding))
+
+        #legendes
+        square_size = 15
+        pygame.draw.rect(self.screen, HEALTH_COLOR, (hud_x+400, 150, square_size, square_size))
+        vie=font_body.render('Health',True,(255,255,255))
+        self.screen.blit(vie, (hud_x+405+square_size, 150))    # on trace une legende pour indiquer que la barre correspond à la barre de  vie
+
+        pygame.draw.rect(self.screen, SHIELD_COLOR, (hud_x+400, 170, square_size, square_size))
+        shield=font_body.render('Shield',True,(255,255,255))
+        self.screen.blit(vie, (hud_x+405+square_size, 170))     #legende barre de shield
+
+        pygame.draw.rect(self.screen, MANA_COLOR, (hud_x+400, 190, square_size, square_size))
+        mana_=font_body.render('Mana',True,(255,255,255))
+        self.screen.blit(mana_, (hud_x+405+square_size, 190))  #legende barre de mana 
+
+
+
+
+
+
+
+
+        # Section joueur 1
+        y_offset = hud_y + 50
+        section_title = font_title.render("Joueur 1", True, WHITE)
+        self.screen.blit(section_title, (hud_x + padding, y_offset))
+        y_offset += 30
+
+        for selected_unit in self.player_units:
+            # Afficher l'image correspondante au joueur 
+            unit_name = font_body.render(f"{selected_unit.nom}", True, WHITE)
+            chemin=selected_unit.image_chemins[selected_unit.nom]
+            self.image = pygame.image.load(chemin)
+            self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
+            
+            self.screen.blit(self.image, (hud_x + padding, y_offset))
+
+            # Afficher les barres de PV et bouclier
+            bar_x = hud_x + padding + 50
+            bar_width = hud_width /2 - 10 * padding 
+            bar_height = 10
+
+            # Barre de PV
+            pv_ratio = selected_unit.health / selected_unit.max_health
+            pygame.draw.rect(self.screen, HEALTH_COLOR, (bar_x, y_offset, int(bar_width * pv_ratio), bar_height))
+            pygame.draw.rect(self.screen, BORDER_COLOR, (bar_x, y_offset, bar_width, bar_height), 1)
+
+            # Barre de bouclier
+            shield_ratio = selected_unit.defense_shield / selected_unit.max_defense_shield
+            pygame.draw.rect(self.screen, SHIELD_COLOR, (bar_x, y_offset + 15, int(bar_width * shield_ratio), bar_height))
+            pygame.draw.rect(self.screen, BORDER_COLOR, (bar_x, y_offset + 15, bar_width, bar_height), 1)
+
+            # Afficher la barre de mana si c'est un mage
+            if isinstance(selected_unit, Mage):
+                if selected_unit.mana > selected_unit.max_mana:
+                    selected_unit.max_mana = selected_unit.mana
+                mana_ratio = selected_unit.mana / selected_unit.max_mana
+                pygame.draw.rect(self.screen, MANA_COLOR, (bar_x, y_offset + 30, int(bar_width * mana_ratio), bar_height))
+                pygame.draw.rect(self.screen, BORDER_COLOR, (bar_x, y_offset + 30, bar_width, bar_height), 1)
+
+            y_offset += 50
+
+        # Section joueur 2
+        y_offset += 10
+        section_title = font_title.render("Joueur 2", True, WHITE)
+        self.screen.blit(section_title, (hud_x + padding, y_offset))
+        y_offset += 30
+
+        for selected_unit in self.enemy_units:
+            # Afficher le nom
+            unit_name = font_body.render(f"{selected_unit.nom}", True, WHITE)
+            chemin=selected_unit.image_chemins[selected_unit.nom]
+            self.image = pygame.image.load(chemin)
+            self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
+            
+            self.screen.blit(self.image, (hud_x + padding, y_offset))
+
+            # Afficher les barres de PV et bouclier
+            bar_x = hud_x + padding + 50
+            bar_width = hud_width /2 - 10 * padding 
+            bar_height = 10
+
+            # Barre de PV
+            pv_ratio = selected_unit.health / selected_unit.max_health
+            pygame.draw.rect(self.screen, HEALTH_COLOR, (bar_x, y_offset, int(bar_width * pv_ratio), bar_height))
+            pygame.draw.rect(self.screen, BORDER_COLOR, (bar_x, y_offset, bar_width, bar_height), 1)
+
+            # Barre de bouclier
+            shield_ratio = selected_unit.defense_shield / selected_unit.max_defense_shield
+            pygame.draw.rect(self.screen, SHIELD_COLOR, (bar_x, y_offset + 15, int(bar_width * shield_ratio), bar_height))
+            pygame.draw.rect(self.screen, BORDER_COLOR, (bar_x, y_offset + 15, bar_width, bar_height), 1)
+
+            y_offset += 50
+
    
 
     def handle_player_turn(self):
@@ -218,10 +311,11 @@ class Game:
             has_acted = False # 标记该单位是否完成行动，目前没有完成行动
             
             while not has_acted:
+                
 
                 # Affichage du joueur
                 font = pygame.font.Font(None, 40)
-                y_offset = 10
+                y_offset = 500
                 x_offset = CELL_SIZE * GRID_SIZE + 100
                 unit_status = f"C'est à {selected_unit.nom} de jouer !"
                 unit_surface = font.render(unit_status, True, WHITE)
@@ -229,7 +323,7 @@ class Game:
               
                 if isinstance(selected_unit,Mage):
                     font = pygame.font.Font(None, 40)
-                    y_offset = 100
+                    y_offset =600
                     x_offset = CELL_SIZE * GRID_SIZE + 50
                     unit_status = ["Déplacement avec les touches du clavier",
                                     "",
@@ -240,13 +334,13 @@ class Game:
                     for unit_status in unit_status:
                         unit_surface = font.render(unit_status, True, WHITE)
                         self.screen.blit(unit_surface, (x_offset, y_offset))
-                        y_offset += 30
+                        y_offset += 20
                 
                 # Si l'unité est un voleur
                 elif isinstance(selected_unit,Voleur):
                     selected_unit.is_invisble = False
                     font = pygame.font.Font(None, 40)
-                    y_offset = 100
+                    y_offset = 600
                     x_offset = CELL_SIZE * GRID_SIZE + 50
                     unit_status = ["Déplacement avec les touches du clavier",
                                     "",
@@ -257,11 +351,11 @@ class Game:
                     for unit_status in unit_status:
                         unit_surface = font.render(unit_status, True, WHITE)
                         self.screen.blit(unit_surface, (x_offset, y_offset))
-                        y_offset += 30
+                        y_offset += 20
 
                 elif isinstance(selected_unit,Guerrier):
                     font = pygame.font.Font(None, 40)
-                    y_offset = 100
+                    y_offset = 600
                     x_offset = CELL_SIZE * GRID_SIZE + 50
                     unit_status = ["Déplacement avec les touches du clavier",
                                     "",
@@ -272,10 +366,10 @@ class Game:
                     for unit_status in unit_status:
                         unit_surface = font.render(unit_status, True, WHITE)
                         self.screen.blit(unit_surface, (x_offset, y_offset))
-                        y_offset += 30
+                        y_offset += 25
                 
                 # Mettre à jour l'affichage
-                pygame.display.flip()
+                pygame.display.flip() 
 
                 for event in pygame.event.get():
 
