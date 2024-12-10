@@ -1,5 +1,6 @@
 import os
 import pygame
+import random
 from unit import CELL_SIZE
 from personnages import Guerrier
 
@@ -120,4 +121,5 @@ class Water(Terrain):
         """Méthode appelée lorsque l'unité quitte l'eau"""
         if hasattr(unit, 'original_speed'):
             unit.speed = unit.original_speed  # 恢复原始速度
+      
       
