@@ -134,7 +134,7 @@ class Game:
 
         pygame.draw.rect(self.screen, SHIELD_COLOR, (hud_x+400, 170, square_size, square_size))
         shield=font_body.render('Shield',True,(255,255,255))
-        self.screen.blit(vie, (hud_x+405+square_size, 170))     #legende barre de shield
+        self.screen.blit(shield, (hud_x+405+square_size, 170))     #legende barre de shield
 
         pygame.draw.rect(self.screen, MANA_COLOR, (hud_x+400, 190, square_size, square_size))
         mana_=font_body.render('Mana',True,(255,255,255))
@@ -325,7 +325,7 @@ class Game:
                 font = pygame.font.Font(chemin_police, 30)
                 y_offset = 500
                 x_offset = CELL_SIZE * GRID_SIZE + 100
-                unit_status = f"C'est à {selected_unit.nom} de jouer !"
+                unit_status = f"A {selected_unit.nom} de jouer "
                 unit_surface = font.render(unit_status, True, WHITE)
                 self.screen.blit(unit_surface, (x_offset, y_offset))
               
