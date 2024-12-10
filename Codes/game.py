@@ -1,6 +1,7 @@
 
 import pygame
 import random
+import os 
 
 
 from unit import *
@@ -66,6 +67,7 @@ class Game:
         screen : pygame.Surface
             La surface de la fenêtre du jeu.
         """
+    
         self.screen = screen
         #self.board = GameBoard(GRID_SIZE)
         self.player_units = [Mage(0, 0, 'player',self),
@@ -118,8 +120,9 @@ class Game:
         pygame.draw.rect(self.screen, BORDER_COLOR, (hud_x, hud_y, hud_width, hud_height), 3)  # Bordure
 
         # Titre du HUD
-        font_title = pygame.font.Font("/police/police.TTF", 35)
-        font_body = pygame.font.Font("/police/police.TTF", 25)
+        chemin_police = "police/police.TTF"
+        font_title = pygame.font.Font(chemin_police, 30)
+        font_body = pygame.font.Font(chemin_police, 20)
         title_surface = font_title.render("Informations", True, WHITE)
         self.screen.blit(title_surface, (hud_x + padding, hud_y + padding))
 
@@ -221,6 +224,8 @@ class Game:
     def handle_player_turn(self):
         
         """Tour du joueur"""
+
+        
     
         for selected_unit in self.player_units:
 
@@ -309,12 +314,15 @@ class Game:
             temp2 = selected_unit.y
 
             has_acted = False # 标记该单位是否完成行动，目前没有完成行动
+
+
+            chemin_police = "police/police.TTF"
             
             while not has_acted:
                 
 
                 # Affichage du joueur
-                font = pygame.font.Font(None, 40)
+                font = pygame.font.Font(chemin_police, 30)
                 y_offset = 500
                 x_offset = CELL_SIZE * GRID_SIZE + 100
                 unit_status = f"C'est à {selected_unit.nom} de jouer !"
@@ -322,7 +330,7 @@ class Game:
                 self.screen.blit(unit_surface, (x_offset, y_offset))
               
                 if isinstance(selected_unit,Mage):
-                    font = pygame.font.Font(None, 40)
+                    font = pygame.font.Font(None,30)
                     y_offset =600
                     x_offset = CELL_SIZE * GRID_SIZE + 50
                     unit_status = ["Déplacement avec les touches du clavier",
@@ -339,7 +347,7 @@ class Game:
                 # Si l'unité est un voleur
                 elif isinstance(selected_unit,Voleur):
                     selected_unit.is_invisble = False
-                    font = pygame.font.Font(None, 40)
+                    font = pygame.font.Font(None, 30)
                     y_offset = 600
                     x_offset = CELL_SIZE * GRID_SIZE + 50
                     unit_status = ["Déplacement avec les touches du clavier",
@@ -354,7 +362,8 @@ class Game:
                         y_offset += 20
 
                 elif isinstance(selected_unit,Guerrier):
-                    font = pygame.font.Font(None, 40)
+                    
+                    font = pygame.font.Font(None, 30)
                     y_offset = 600
                     x_offset = CELL_SIZE * GRID_SIZE + 50
                     unit_status = ["Déplacement avec les touches du clavier",
