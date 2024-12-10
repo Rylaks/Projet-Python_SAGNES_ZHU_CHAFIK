@@ -44,27 +44,28 @@ class Skills:
     def heal(self,target):
         """Soigne les points de vie d'une unité alliée à portée, et utilise du mana"""
         
-        p1 = random.random()
-        p2 = random.random()
-        if p1 < 0.2: #20% de chances de coup critique
-            self.critique = True
-        if p2 < 0.4: #40% de chances de rater
-            self.miss = True
-        if self.miss:
-            print("Manqué !")
-        elif not self.critique:
-            if target.team == "player":
-                target.health += self.mana
-                self.mana = 0
-            else:
-                raise TypeError ("Cette compétence ne peut être utiliser que sur des unités alliées")
-        elif self.critique:
-            if target.team == "player":
-                target.health += self.mana*2
-                self.mana = 0
-            else:
-                raise TypeError ("Cette compétence ne peut être utiliser que sur des unités alliées")
-            print("Critique !")
+        if (target.max_health>target.health): 
+            p1 = random.random()
+            p2 = random.random()
+            if p1 < 0.2: #20% de chances de coup critique
+                self.critique = True
+            if p2 < 0.4: #40% de chances de rater
+                self.miss = True
+            if self.miss:
+                print("Manqué !")
+            elif not self.critique:
+                if target.team == "player":
+                    target.health += self.mana
+                    self.mana = 0
+                else:
+                    raise TypeError ("Cette compétence ne peut être utiliser que sur des unités alliées")
+            elif self.critique:
+                if target.team == "player":
+                    target.health += self.mana*2
+                    self.mana = 0
+                else:
+                    raise TypeError ("Cette compétence ne peut être utiliser que sur des unités alliées")
+                print("Critique !")
 
     #pour les mages:     
     def fire_ball(self,pointeur_x,pointeur_y,unit):
