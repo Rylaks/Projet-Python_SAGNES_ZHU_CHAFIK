@@ -46,21 +46,19 @@ class Bush(Terrain):
      
         if not hasattr(unit, 'original_speed'):
             unit.original_speed = unit.speed  # 存储原始速度
+        
         unit.invisible = True  # 隐身
         
         unit.speed = unit.original_speed * 2  # 双倍速度
        
-
-        unit.turns_in_bush = 0  # 初始化在草地的回合数
+        
         return True
     
-    def stay_effect(self, unit):
-        """Effet appliqué lorsque l'unité reste dans le buisson"""
-        unit.turns_in_bush += 1  # Incrémente le nombre de tours dans le buisson
-        unit.invisible = False  # Devient visible en restant
-        if unit.turns_in_bush > 2:
-            unit.health += 1  # Si plus de deux tours, augmente la santé
-
+    def stay_effect(self,unit):
+        
+        unit.health +=1
+        
+    
     def remove_effect(self, unit):
         print(f"Before remove: {unit.speed}")
         """Méthode appelée lorsque l'unité quitte le buisson"""
@@ -113,17 +111,13 @@ class Water(Terrain):
         if not hasattr(unit, 'original_speed'):
             unit.original_speed = unit.speed  # 存储原始速度
         unit.speed = max(1, int(unit.original_speed * 0.5))  # 减速到原来的 50%
-        unit.turns_in_water = 0
+        
+       
         return True
     
-    def stay_effect(self, unit):
-        """Effet appliqué lorsque l'unité reste dans l'eau"""
-        unit.turns_in_water += 1  # Incrémente le nombre de tours dans l'eau
-        if unit.turns_in_water > 2:
-            unit.health -= 1  # Si plus de deux tours, réduit la santé de 10
-
+    
     def remove_effect(self, unit):
         """Méthode appelée lorsque l'unité quitte l'eau"""
         if hasattr(unit, 'original_speed'):
             unit.speed = unit.original_speed  # 恢复原始速度
-        unit.turns_in_water = 0
+      

@@ -12,28 +12,35 @@ from unit import *
 from diff_case import *
 
 class GameBoard:
-    def __init__(self, size,occupied_positions):
+    def __init__(self, size, occupied_positions):
         self.size = size
         self.grid = [[Terrain() for _ in range(size)] for _ in range(size)]
         
-        # Place bushes, rocks, and water avoiding character positions
-        self.place_terrain(Bush, random.randint(10, 20),occupied_positions)
-        self.place_terrain(Rock, random.randint(10, 20),occupied_positions)
-        self.place_terrain(Water, random.randint(10, 20),occupied_positions)
+        # 确保从左下到右上的区域填充水格子
+        self.create_water_path()
         
-        
-        
-        
+        # 随机生成其他格子，避免水格子和占用位置
+        self.place_terrain(Bush, random.randint(5, 10), occupied_positions)
+        self.place_terrain(Rock, random.randint(40, 80), occupied_positions)
+
+    def create_water_path(self):
+        """生成从左下到右上的水格子路径，厚度为3格"""
+        for i in range(self.size):
+            for j in range(max(0, i-2), min(self.size, i+3)):  # 控制厚度为3格
+                self.grid[self.size - 1 - i][j] = Water()
+
     def place_terrain(self, terrain_class, count, occupied_positions):
-        for _ in range(count):   # Boucler pour garantir la création du nombre spécifié de terrains.
-            placed = False     # Indique que le terrain n'a pas encore été placé avec succès.
-            while not placed:   # Boucle pour choisir aléatoirement une position sur la carte jusqu'à ce qu'une position appropriée soit trouvée.
-                x, y = random.randint(0, self.size - 1), random.randint(0, self.size - 1)  # Génère aléatoirement les coordonnées x et y.
-                if (x, y) not in occupied_positions:  # Vérifie si les coordonnées générées (x, y) ne sont pas dans l'ensemble occupied_positions. Cet ensemble contient toutes les positions déjà occupées par les personnages, assurant ainsi que le terrain ne se superpose pas avec les positions des personnages.
-                    self.grid[y][x] = terrain_class()   # Si les coordonnées (x, y) ne sont pas dans occupied_positions, cela signifie que cette position peut accueillir un nouveau terrain.
-                    placed = True    # Mettre placed à True pour sortir de la boucle while, indiquant que le terrain a été placé avec succès.
-    
-    
+        """随机放置指定数量的地形，避免已占用的位置"""
+        available_positions = [
+            (x, y) for x in range(self.size) for y in range(self.size)
+            if isinstance(self.grid[x][y], Terrain) and (x, y) not in occupied_positions
+        ]
+        
+        random.shuffle(available_positions)
+        for _ in range(min(count, len(available_positions))):
+            x, y = available_positions.pop()
+            self.grid[x][y] = terrain_class()
+
    
     def draw(self,screen):
         for y in range(self.size):
@@ -666,7 +673,7 @@ class Game:
             
             # 应用当前地形的停留效果
             current_terrain = self.board.grid[enemy.y][enemy.x]
-            current_terrain.stay_effect(enemy)
+            current_terrain.apply_effect(enemy)
             
             
             is_occupied = False
@@ -685,7 +692,7 @@ class Game:
 
                 # 重新应用移动后的地形效果
                 current_terrain = self.board.grid[enemy.y][enemy.x]
-                current_terrain.stay_effect(enemy)
+                current_terrain.apply_effect(enemy)
             
             
             # Attaque si possible
