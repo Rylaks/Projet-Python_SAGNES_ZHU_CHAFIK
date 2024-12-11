@@ -527,7 +527,7 @@ class Game:
                                                 font = pygame.font.Font(None, 40)
                                                 error_msg = "Aucune cible valide à cet endroit !"
                                                 error_surface = font.render(error_msg, True, RED)
-                                                self.screen.blit(error_surface, (CELL_SIZE * GRID_SIZE + 100, 100))
+                                                self.screen.blit(error_surface, (CELL_SIZE * GRID_SIZE + 100, 600))
                                                 pygame.display.flip()
                                                 pygame.time.wait(1000)
                                                 choose = False
@@ -535,9 +535,9 @@ class Game:
                                             if isinstance(target,Voleur): # Vérification si la cible n'est pas invisible
                                                 if target.is_invisible:
                                                     font = pygame.font.Font(None, 40)
-                                                    error_msg = "Cette unité porte l'anneau ! Impossible de l'attaquer !"
+                                                    error_msg = "Cette unité porte l'anneau ! Impossible !"
                                                     error_surface = font.render(error_msg, True, RED)
-                                                    self.screen.blit(error_surface, (CELL_SIZE * GRID_SIZE + 100, 100))
+                                                    self.screen.blit(error_surface, (CELL_SIZE * GRID_SIZE + 50, 600))
                                                     pygame.display.flip()
                                                     pygame.time.wait(1000)
                                                     target = None
@@ -739,7 +739,7 @@ class Game:
             font = pygame.font.Font(None, 30)
             red = (255, 0, 0)
             info = "Echap pour annuler"
-            info_surface = font.render(info, True, WHITE)
+            info_surface = font.render(info, True, RED)
             self.screen.blit(info_surface, (CELL_SIZE * GRID_SIZE + 100, 10))
             
             if self.special_skill:
