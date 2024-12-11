@@ -341,7 +341,7 @@ class Game:
               
                 if isinstance(selected_unit,Mage):
                     font = pygame.font.Font(None,30)
-                    y_offset =600
+                    y_offset =550
                     x_offset = CELL_SIZE * GRID_SIZE + 50
                     unit_status = ["Déplacement avec les touches du clavier",
                                     "",
@@ -358,7 +358,7 @@ class Game:
                 elif isinstance(selected_unit,Voleur):
                     selected_unit.is_invisble = False
                     font = pygame.font.Font(None, 30)
-                    y_offset = 600
+                    y_offset = 550
                     x_offset = CELL_SIZE * GRID_SIZE + 50
                     unit_status = ["Déplacement avec les touches du clavier",
                                     "",
@@ -374,7 +374,7 @@ class Game:
                 elif isinstance(selected_unit,Guerrier):
                     
                     font = pygame.font.Font(None, 30)
-                    y_offset = 600
+                    y_offset = 550
                     x_offset = CELL_SIZE * GRID_SIZE + 50
                     unit_status = ["Déplacement avec les touches du clavier",
                                     "",
@@ -738,12 +738,9 @@ class Game:
                             self.point.y * CELL_SIZE, CELL_SIZE, CELL_SIZE),width=5)
             font = pygame.font.Font(None, 30)
             red = (255, 0, 0)
-            info = "Choisir une cible avec les touches directionnelles"
-            info2 = "Echap pour annuler"
+            info = "Echap pour annuler"
             info_surface = font.render(info, True, WHITE)
             self.screen.blit(info_surface, (CELL_SIZE * GRID_SIZE + 100, 10))
-            info_surface = font.render(info2, True, WHITE)
-            self.screen.blit(info_surface, (CELL_SIZE * GRID_SIZE + 200, 40))
             
             if self.special_skill:
                 case_yellow = []

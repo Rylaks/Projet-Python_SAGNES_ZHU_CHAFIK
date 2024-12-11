@@ -31,6 +31,8 @@ class Mage(Personnage,Skills):    #Mage: vitesse moyenne, attaque elevée, boucl
     ----------
     health : int
         La santé de l'unité.
+    max_health : int
+        La santé maximale de l'unité
     mana : int
         La quantité de mana de l'unité
     attack_power : int
@@ -89,6 +91,8 @@ class Voleur(Personnage,Skills):    #Voleur: vitesse grande, attaque faible, bou
     ----------
     health : int
         La santé de l'unité.
+    max_health : int
+        La santé maximale de l'unité
     attack_power : int
         La puissance d'attaque de l'unité.
     is_invisible : bool
@@ -146,6 +150,8 @@ class Guerrier(Personnage,Skills):    #Guerrier: vitesse faible, attaque grandes
     ----------
     health : int
         La santé de l'unité.
+    max_health : int
+        La santé maximale de l'unité
     attack_power : int
         La puissance d'attaque de l'unité.
     defense_shield : int
