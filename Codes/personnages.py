@@ -51,7 +51,7 @@ class Mage(Personnage,Skills):    #Mage: vitesse moyenne, attaque elevée, boucl
         Personnage.__init__(self,x,y,team,game)
         Skills.__init__(self)
         self.health = 10
-        self.max_health=10 
+        self.max_health = 10 
         self.mana = 9 #commencera la partie avec 10 car en obtient 1 à chaque tour.
         self.max_mana=9  # qu'on va utiliser pour pouvoir afficher la barre de mana 
         self.attack_power = 8
@@ -109,7 +109,7 @@ class Voleur(Personnage,Skills):    #Voleur: vitesse grande, attaque faible, bou
         Personnage.__init__(self,x,y,team,game)
         Skills.__init__(self)
         self.health = 10
-        self.max_health=10
+        self.max_health = 10
         self.attack_power = 5
         self.is_invisible = False
         self.defense_shield = 7
@@ -164,7 +164,7 @@ class Guerrier(Personnage,Skills):    #Guerrier: vitesse faible, attaque grandes
         Personnage.__init__(self,x,y,team,game)
         Skills.__init__(self)
         self.health = 30
-        self.max_health=30
+        self.max_health = 30
         self.attack_power = 10
         self.defense_shield = 10
         self.max_defense_shield=10
