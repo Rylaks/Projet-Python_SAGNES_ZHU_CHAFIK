@@ -22,12 +22,15 @@ class GameBoard:
         # 随机生成其他格子，避免水格子和占用位置
         self.place_terrain(Bush, random.randint(10, 20), occupied_positions)
         self.place_terrain(Rock, random.randint(30, 50), occupied_positions)
+        self.place_terrain(HealthPack, random.randint(3, 6), occupied_positions)
+        #self.place_terrain(CrossRiver, random.randint(2, 5), occupied_positions)  # 随机生成能过河道具
+
         # self.place_terrain(Portal, random.randint(2, 5), occupied_positions)
 
     def create_water_path(self):
         """生成从左下到右上的水格子路径，厚度为3格"""
         for i in range(self.size):
-            for j in range(max(0, i - 3), min(self.size, i + 4)):  # 控制厚度为3格
+            for j in range(max(0, i - 2), min(self.size, i + 3)):  # 控制厚度为3格
                 self.grid[self.size - 1 - i][j] = Water()  # 从左下到右上填充水
 
     def place_terrain(self, terrain_class, count, occupied_positions):

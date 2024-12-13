@@ -1,5 +1,5 @@
 import pygame
-import random
+
 
 # Constantes
 GRID_SIZE = 17
@@ -50,7 +50,7 @@ class Unit:
         self.__is_selected = False
         self.game = game # 引用游戏实例以访问其他游戏元素
         self.green_cases = []
-        self.red_cases = []
+        #self.red_cases = []
         
     
   
@@ -100,37 +100,83 @@ class Unit:
                     print("Movement blocked by terrain at:", new_x, new_y)
 
     def update_move_range(self):
-        self.green_cases = [] # 清空旧的移动范围
+        from personnages import Mage
+        from diff_case import Water
+
+        self.green_cases = []  # 清空旧的移动范围
         start_x, start_y = self.x, self.y  # 获取当前单位的位置
         speed = int(self.speed)
         print(f"Speed: {speed}, Position: ({self.x}, {self.y})")  # 打印速度和位置
-        
+
         # 包括单位当前所在格子
         self.green_cases.append((start_x, start_y))
-        
+
         # 遍历以单位为中心的正方形区域
         for dy in range(-speed, speed + 1):
             for dx in range(-speed, speed + 1):
                 green_x = start_x + dx
                 green_y = start_y + dy
-                
+
                 # 确保格子在边界内
                 if 0 <= green_x < GRID_SIZE and 0 <= green_y < GRID_SIZE:
                     # 检查格子是否被占用
                     if not self.game.is_occupied(green_x, green_y):
-                        
                         terrain = self.game.board.grid[green_y][green_x]
-                        
+
                         if terrain.apply_effect(self):
                             self.green_cases.append((green_x, green_y))
-        
-   
+
+        # 如果是 Mage，直接返回 green_cases，不需要过滤水格子
+        if isinstance(self, Mage):
+            return
+
+        # 对 Guerrier 和 Voleur，过滤掉被水格子阻挡的格子
+        filtered_cases = self.green_cases[:]
+        for green_x, green_y in self.green_cases:
+            for water_y in range(GRID_SIZE):
+                for water_x in range(GRID_SIZE):
+                    terrain = self.game.board.grid[water_y][water_x]
+                    if isinstance(terrain, Water):  # 找到水格子
+                        # 检测水格子阻挡的逻辑（四种位置）
+                        if (
+                            (start_x <= water_x and start_y <= water_y and green_x > water_x and green_y > water_y) or
+                            (start_x >= water_x and start_y >= water_y and green_x < water_x and green_y < water_y) or
+                            (start_x <= water_x and start_y >= water_y and green_x > water_x and green_y < water_y) or
+                            (start_x >= water_x and start_y <= water_y and green_x < water_x and green_y > water_y)
+                        ):
+                            if (green_x, green_y) in filtered_cases:
+                                filtered_cases.remove((green_x, green_y))
+                        # 检测直线穿越水格子的情况
+                        elif (
+                            (start_x < water_x and green_x > water_x and start_y == green_y == water_y) or
+                            (start_y < water_y and green_y > water_y and start_x == green_x == water_x) or
+                            (start_x > water_x and green_x < water_x and start_y == green_y == water_y) or
+                            (start_y > water_y and green_y < water_y and start_x == green_x == water_x)
+                        ):
+                            if (green_x, green_y) in filtered_cases:
+                                filtered_cases.remove((green_x, green_y))
+
+        # 更新 green_cases 为过滤后的格子列表
+        self.green_cases = filtered_cases
+
+
+    
+    
+    
+    
+    
+    
+    
+            
     def draw_move_range(self, screen):
         for green_x, green_y in self.green_cases:
             # 用绿色高亮显示可以移动到的格子
             pygame.draw.rect(screen, GREEN, (green_x * CELL_SIZE, green_y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)    
     
     
+    def replace_current_terrain(self, new_terrain):
+        """替换单位当前位置的地形"""
+        self.game.board.grid[self.y][self.x] = new_terrain
    
     @property
     def is_selected(self):

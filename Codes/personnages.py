@@ -16,8 +16,7 @@ class Personnage(ABC,Unit):
 
     def __init__(self, x, y, team, game):
         super().__init__(x,y,team,game)
-        self.turns_in_water = 0  # 初始化在水中的回合数
-        self.turns_in_bush = 0   # 初始化在灌木中的回合数
+        
 
     @abstractmethod
     def draw(self,screen):
