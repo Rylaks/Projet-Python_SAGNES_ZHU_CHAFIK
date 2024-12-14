@@ -92,7 +92,7 @@ class Unit:
         Les mages ignorent les restrictions liées à l'eau.
         """
         from personnages import Mage
-        from diff_case import Water
+        from Terrain import Water
 
         self.green_cases = []  # Réinitialise les cases accessibles
         start_x, start_y = self.x, self.y  # Position initiale de l'unité

@@ -9,7 +9,7 @@ from unit import GRID_SIZE, Unit, HEIGHT, WHITE, BLACK, RED, WIDTH, YELLOW
 from personnages import *
 from skills import *
 from unit import *
-from diff_case import *
+from Terrain import *
 
 class GameBoard:
     def __init__(self, size, occupied_positions):
