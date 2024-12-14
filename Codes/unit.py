@@ -1,143 +1,135 @@
 import pygame
 
-
 # Constantes
-GRID_SIZE = 17
-CELL_SIZE = 45
-WIDTH = GRID_SIZE * CELL_SIZE
-HEIGHT = GRID_SIZE * CELL_SIZE
-FPS = 30
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
-YELLOW = (0,255,255)
+GRID_SIZE = 17  # Taille de la grille (nombre de cases par côté)
+CELL_SIZE = 45  # Taille d'une cellule en pixels
+WIDTH = GRID_SIZE * CELL_SIZE  # Largeur totale de la grille
+HEIGHT = GRID_SIZE * CELL_SIZE  # Hauteur totale de la grille
+FPS = 30  # Nombre d'images par seconde
+WHITE = (255, 255, 255)  # Couleur blanche
+BLACK = (0, 0, 0)  # Couleur noire
+RED = (255, 0, 0)  # Couleur rouge
+BLUE = (0, 0, 255)  # Couleur bleue
+GREEN = (0, 255, 0)  # Couleur verte pour les cases de mouvement
+YELLOW = (0, 255, 255)  # Couleur jaune
 
 class Unit:
     """
-    Classe pour représenter une unité et la déplacer.
+    Classe pour représenter une unité et gérer ses déplacements.
 
-    ...
-    Attributs
-    ---------
-    x : int
-        La position x de l'unité sur la grille.
-    y : int
-        La position y de l'unité sur la grille.
-    team : str
-        L'équipe de l'unité ('player' ou 'enemy' ou 'pointeur').
-    is_selected : bool
-        Si l'unité est sélectionnée ou non.
-    game : Game
-        Jeu Pygame.
+    Attributs :
+    -----------
+    - x : Position X de l'unité dans la grille.
+    - y : Position Y de l'unité dans la grille.
+    - team : Équipe de l'unité ('player', 'enemy' ou 'pointeur').
+    - is_selected : Indique si l'unité est sélectionnée.
+    - game : Instance du jeu pour accéder à la grille et aux éléments.
 
-    Méthodes
-    --------
-    move(dx, dy)
-        Déplace l'unité de dx, dy.
-    update_move_range()
-        met à jour la range.
-    draw_move_range()
-        dessine la range.
-    
+    Méthodes :
+    ----------
+    - move(dx, dy) : Déplace l'unité dans la direction donnée.
+    - update_move_range() : Met à jour les cases accessibles pour l'unité.
+    - draw_move_range(screen) : Dessine les cases accessibles sur l'écran.
+    - replace_current_terrain(new_terrain) : Remplace le terrain actuel de l'unité.
     """
 
-    def __init__(self, x, y, team,game):
-        self.x = x
-        self.y = y
-        self.team = team #'player' ou 'enemy' ou 'pointeur'
-        self.__is_selected = False
-        self.game = game # 引用游戏实例以访问其他游戏元素
-        self.green_cases = []
-        #self.red_cases = []
+    def __init__(self, x, y, team, game):
+        self.x = x  # Position de l'unité sur l'axe X
+        self.y = y  # Position de l'unité sur l'axe Y
+        self.team = team  # Équipe de l'unité ('player', 'enemy' ou 'pointeur')
+        self.__is_selected = False  # Indique si l'unité est sélectionnée
+        self.game = game  # Référence à l'instance du jeu
+        self.green_cases = []  # Liste des cases accessibles (mises en évidence)
         
-    
-  
     def move(self, dx, dy):
+        """
+        Déplace l'unité d'une distance donnée (dx, dy).
+        """
         dx = int(dx)
         dy = int(dy)
         
         new_x = int(self.x + dx)
         new_y = int(self.y + dy)
         
-        #Ne pas toucher! Pour que le pointeur bouge
+        # Déplacement spécifique pour le pointeur
         if self.team == 'pointeur':
             if 0 <= new_x < GRID_SIZE and 0 <= new_y < GRID_SIZE:
                 self.x = new_x
                 self.y = new_y
 
-
-        #IA très basique
+        # Déplacement IA simple pour les ennemis
         elif self.team == 'enemy':
             if 0 <= new_x < GRID_SIZE and 0 <= new_y < GRID_SIZE:
                 self.x = new_x
                 self.y = new_y
 
-        else:
-            # 检查是否在允许的移动范围内
+        else:  # Déplacement des unités du joueur
+            # Vérifie si la destination est dans la portée autorisée
             if (new_x, new_y) not in self.green_cases:
-                print(f"Movement to ({new_x}, {new_y}) is out of allowed range.")
-                return  # 如果不在允许的范围内，不进行移动
+                print(f"Déplacement vers ({new_x}, {new_y}) interdit.")
+                return
             
             if 0 <= new_x < GRID_SIZE and 0 <= new_y < GRID_SIZE:
-                
-                # mise a jour le type de terrain
+                # Gestion du terrain
                 old_terrain = self.game.board.grid[self.y][self.x]
                 new_terrain = self.game.board.grid[new_y][new_x]
 
-                # 检查地形是否允许移动
+                # Applique les effets du terrain
                 can_move = new_terrain.apply_effect(self)
-                print(f"Trying to move to ({new_x}, {new_y}) - Move allowed: {can_move}")
+                print(f"Tentative de déplacement vers ({new_x}, {new_y}) - Autorisé : {can_move}")
 
-                # Check if the terrain allows movement
-                if can_move: # Mise à jour de la position si le mouvement est autorisé
+                if can_move:  # Met à jour la position si le mouvement est autorisé
                     old_terrain.remove_effect(self)
                     self.x = new_x
                     self.y = new_y
-                    print("Unit moved to:", new_x, new_y)
+                    print("Déplacement effectué :", new_x, new_y)
                 else:
-                    print("Movement blocked by terrain at:", new_x, new_y)
+                    print("Déplacement bloqué par le terrain :", new_x, new_y)
 
     def update_move_range(self):
+        """
+        Met à jour la liste des cases accessibles pour l'unité.
+        Les mages ignorent les restrictions liées à l'eau.
+        """
         from personnages import Mage
         from diff_case import Water
 
-        self.green_cases = []  # 清空旧的移动范围
-        start_x, start_y = self.x, self.y  # 获取当前单位的位置
+        self.green_cases = []  # Réinitialise les cases accessibles
+        start_x, start_y = self.x, self.y  # Position initiale de l'unité
         speed = int(self.speed)
-        print(f"Speed: {speed}, Position: ({self.x}, {self.y})")  # 打印速度和位置
+        print(f"Vitesse : {speed}, Position : ({self.x}, {self.y})")
 
-        # 包括单位当前所在格子
+        # Ajoute la position actuelle comme case accessible
         self.green_cases.append((start_x, start_y))
 
-        # 遍历以单位为中心的正方形区域
+        # Parcourt la zone autour de l'unité pour calculer les déplacements possibles
         for dy in range(-speed, speed + 1):
             for dx in range(-speed, speed + 1):
                 green_x = start_x + dx
                 green_y = start_y + dy
 
-                # 确保格子在边界内
+                # Vérifie si la case est dans les limites de la grille
                 if 0 <= green_x < GRID_SIZE and 0 <= green_y < GRID_SIZE:
-                    # 检查格子是否被占用
+                    # Vérifie si la case est occupée
                     if not self.game.is_occupied(green_x, green_y):
                         terrain = self.game.board.grid[green_y][green_x]
 
+                        # Ajoute la case si le terrain permet le déplacement
                         if terrain.apply_effect(self):
                             self.green_cases.append((green_x, green_y))
 
-        # 如果是 Mage，直接返回 green_cases，不需要过滤水格子
-        if isinstance(self, Mage):
+        # Les mages ne sont pas affectés par les restrictions des cases d'eau
+        if not isinstance(self, Mage):
             return
 
-        # 对 Guerrier 和 Voleur，过滤掉被水格子阻挡的格子
+        # Filtre les cases bloquées par les terrains d'eau
         filtered_cases = self.green_cases[:]
         for green_x, green_y in self.green_cases:
             for water_y in range(GRID_SIZE):
                 for water_x in range(GRID_SIZE):
                     terrain = self.game.board.grid[water_y][water_x]
-                    if isinstance(terrain, Water):  # 找到水格子
-                        # 检测水格子阻挡的逻辑（四种位置）
+                    if isinstance(terrain, Water):
+                        # Logique de restriction pour les terrains d'eau
                         if (
                             (start_x <= water_x and start_y <= water_y and green_x > water_x and green_y > water_y) or
                             (start_x >= water_x and start_y >= water_y and green_x < water_x and green_y < water_y) or
@@ -146,38 +138,22 @@ class Unit:
                         ):
                             if (green_x, green_y) in filtered_cases:
                                 filtered_cases.remove((green_x, green_y))
-                        # 检测直线穿越水格子的情况
-                        elif (
-                            (start_x < water_x and green_x > water_x and start_y == green_y == water_y) or
-                            (start_y < water_y and green_y > water_y and start_x == green_x == water_x) or
-                            (start_x > water_x and green_x < water_x and start_y == green_y == water_y) or
-                            (start_y > water_y and green_y < water_y and start_x == green_x == water_x)
-                        ):
-                            if (green_x, green_y) in filtered_cases:
-                                filtered_cases.remove((green_x, green_y))
+        
+        self.green_cases = filtered_cases  # Met à jour les cases accessibles
 
-        # 更新 green_cases 为过滤后的格子列表
-        self.green_cases = filtered_cases
-
-
-    
-    
-    
-    
-    
-    
-    
-            
     def draw_move_range(self, screen):
+        """
+        Dessine les cases accessibles en vert sur l'écran.
+        """
         for green_x, green_y in self.green_cases:
-            # 用绿色高亮显示可以移动到的格子
-            pygame.draw.rect(screen, GREEN, (green_x * CELL_SIZE, green_y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)    
-    
+            pygame.draw.rect(screen, GREEN, (green_x * CELL_SIZE, green_y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)
     
     def replace_current_terrain(self, new_terrain):
-        """替换单位当前位置的地形"""
+        """
+        Remplace le terrain actuel sur lequel se trouve l'unité.
+        """
         self.game.board.grid[self.y][self.x] = new_terrain
-   
+
     @property
     def is_selected(self):
         return self.__is_selected
@@ -185,9 +161,8 @@ class Unit:
     @is_selected.setter
     def is_selected(self, value):
         if not isinstance(value, bool):
-            raise ValueError("is_selected doit être un booléen")
+            raise ValueError("L'attribut 'is_selected' doit être un booléen.")
         self.__is_selected = value
-
 
     image_chemins = {
         "Bilbon": "images/Bilbon.png",
@@ -197,4 +172,3 @@ class Unit:
         "Gandalf le Gris": "images/gandalf.png",
         "Saroumane le Blanc": "images/Saroumane.png",
     }
-        

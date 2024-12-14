@@ -13,11 +13,6 @@ class Terrain():
         self.image.fill((100, 100, 100))  # Colore la surface en gris par défaut
     
     
-    def stay_effect(self, unit):
-        """Appliquer l'effet du terrain à l'unité, implémenté dans les sous-classes"""
-        pass
-    
-    
     def apply_effect(self, unit):
         """Appliquer l'effet du terrain à l'unité, implémenté dans les sous-classes"""
         return True
@@ -45,26 +40,19 @@ class Bush(Terrain):
     def apply_effect(self, unit):
      
         if not hasattr(unit, 'original_speed'):
-            unit.original_speed = unit.speed  # 存储原始速度
-        
-        unit.invisible = True  # 隐身
-        
-        unit.speed = unit.original_speed * 2  # 双倍速度
-       
+            unit.original_speed = unit.speed # Sauvegarde la vitesse originale
+        unit.invisible = True  # Rendre l'unité invisible
+        unit.speed = unit.original_speed * 2  # Double la vitesse
         return True
     
-    def stay_effect(self,unit):
-        
-        unit.health +=1
         
     
     def remove_effect(self, unit):
         print(f"Before remove: {unit.speed}")
         """Méthode appelée lorsque l'unité quitte le buisson"""
         if hasattr(unit, 'original_speed'):
-            unit.speed = unit.original_speed  # 恢复原始速度
-        unit.invisible = False
-        unit.turns_in_bush = 0
+            unit.speed = unit.original_speed  # # Restaure la vitesse originale
+        unit.invisible = False # Rendre l'unité non invisible
         print(f"After remove: {unit.speed}")
         
         
@@ -73,7 +61,7 @@ class Rock(Terrain):
         super().__init__()
         self.passable = False  # Par défaut, le rocher est infranchissable
         
-        # 动态构造图片路径
+        # Chargement de l'image du rocher
         project_root = os.path.dirname(os.path.dirname(__file__))
         image_path = os.path.join(project_root, "images", "rock.png")
         
@@ -89,8 +77,6 @@ class Rock(Terrain):
         return False  # Les autres unités ne peuvent pas traverser le rocher
 
     def remove_effect(self, unit):
-        """Logique lorsqu'une unité quitte une case rocheuse"""
-        
         pass
     
 class Water(Terrain):
@@ -98,7 +84,7 @@ class Water(Terrain):
         super().__init__()
         self.visible = True  # L'eau est visible
         
-        # 动态构造图片路径
+        # Chargement de l'image du rocher
         project_root = os.path.dirname(os.path.dirname(__file__))
         image_path = os.path.join(project_root, "images", "water.png")
         
@@ -108,45 +94,46 @@ class Water(Terrain):
     def apply_effect(self, unit):
         """Méthode appelée lorsque l'unité traverse de l'eau"""
         if not hasattr(unit, 'original_speed'):
-            unit.original_speed = unit.speed  # 存储原始速度
-        unit.speed = max(1, int(unit.original_speed * 0.5))  # 减速到原来的 50%
+            unit.original_speed = unit.speed  # Sauvegarde la vitesse originale
+        unit.speed = max(1, int(unit.original_speed * 0.5)) # Ralentit la vitesse
         
         if isinstance(unit, Mage):
-            self.passable = True  # Le Mage peut passer le water 
-            return True  # Permet au Guerrier de continuer son mouvement
-        return False  # Les autres unités ne peuvent pas traverser le rocher
+            self.passable = False  # Le Mage peut  passer le water 
+            return False  # Permet au Guerrier de continuer son mouvement
+        return True  # Les autres unités ne peuvent pas traverser le rocher
       
     
     
     def remove_effect(self, unit):
         """Méthode appelée lorsque l'unité quitte l'eau"""
         if hasattr(unit, 'original_speed'):
-            unit.speed = unit.original_speed  # 恢复原始速度
+            unit.speed = unit.original_speed  # revient au vitesse original
       
       
 class HealthPack(Terrain):
     def __init__(self):
         super().__init__()
-        self.visible = True  # 血包是可见的
+        self.visible = True  # Le pack de soins est visible
         
-        # 动态构造图片路径
+         # Chargement de l'image du pack de soins
         project_root = os.path.dirname(os.path.dirname(__file__))
         image_path = os.path.join(project_root, "images", "health_pack.png")
         
-        # 加载图片
+
         self.image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))  # 确保大小正确
 
     def apply_effect(self, unit):
         """
-        当单位踩上去时，恢复单位的生命值，并将格子变成普通地形。
+        Soigne l'unité d'un point de vie et transforme la case en terrain normal.
         """
         if hasattr(unit, 'health') and hasattr(unit, 'max_health'):
-            if unit.health < unit.max_health:  # 只有在生命值未满时才加血
-                unit.health = min(unit.health + 1, unit.max_health) 
+            if unit.health < unit.max_health:  # Soigne seulement si l'unité n'est pas en pleine santé
+                unit.health = min(unit.health + 1, unit.max_health) #si le santé est déja au max, ne soigne pas 
                 print(f"{unit} has healed 1 HP!")
         
-        # 告诉单位切换当前格子
+        # Transforme la case actuelle en terrain normal
         unit.replace_current_terrain(Terrain())
 
-        return True  # 允许单位继续移动
+        return True  # L'unité peut continuer son mouvement
+

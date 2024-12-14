@@ -16,25 +16,22 @@ class GameBoard:
         self.size = size
         self.grid = [[Terrain() for _ in range(size)] for _ in range(size)]
         
-        # 确保从左下到右上的区域填充水格子
+        # Assurez-vous que la zone de gauche en bas à droite en haut est remplie de cases d'eau
         self.create_water_path()
         
-        # 随机生成其他格子，避免水格子和占用位置
+        # Générer des autres cases aléatoires, en évitant les cases d'eau et les positions occupées
         self.place_terrain(Bush, random.randint(10, 20), occupied_positions)
         self.place_terrain(Rock, random.randint(30, 50), occupied_positions)
-        self.place_terrain(HealthPack, random.randint(3, 6), occupied_positions)
-        #self.place_terrain(CrossRiver, random.randint(2, 5), occupied_positions)  # 随机生成能过河道具
-
-        # self.place_terrain(Portal, random.randint(2, 5), occupied_positions)
-
+        self.place_terrain(HealthPack, random.randint(10, 15), occupied_positions)
+       
     def create_water_path(self):
-        """生成从左下到右上的水格子路径，厚度为3格"""
+        """Génère un chemin d'eau de gauche en bas à droite en haut avec une épaisseur de 3 cases"""
         for i in range(self.size):
-            for j in range(max(0, i - 2), min(self.size, i + 3)):  # 控制厚度为3格
-                self.grid[self.size - 1 - i][j] = Water()  # 从左下到右上填充水
+            for j in range(max(0, i - 1), min(self.size, i + 2)):  # Contrôle une épaisseur de 3 cases
+                self.grid[self.size - 1 - i][j] = Water()  # Remplit les cases d'eau en diagonale
 
     def place_terrain(self, terrain_class, count, occupied_positions):
-        """随机放置指定数量的地形，避免已占用的位置和水格子"""
+        """Place un terrain aléatoire en évitant les positions occupées et les cases d'eau"""
         available_positions = [
             (x, y) for x in range(self.size) for y in range(self.size)
             if isinstance(self.grid[x][y], Terrain) and not isinstance(self.grid[x][y], Water)  # 避免覆盖水格子
@@ -301,15 +298,15 @@ class Game:
                 exit()
 
             # Tant que l'unité n'a pas terminé son tour
-            selected_unit.is_selected = True # 标记单位为选中状态，显示移动范围
+            selected_unit.is_selected = True # Marque l'unité comme sélectionnée, affiche la portée de déplacement
             
-            # 更新单位当前所在地形的效果（影响下一次移动）
+             # Met à jour l'effet du terrain actuel de l'unité (impacte le prochain mouvement)
             current_terrain = self.board.grid[selected_unit.y][selected_unit.x]
-            current_terrain.apply_effect(selected_unit)  # 更新效果，如速度变化
+            current_terrain.apply_effect(selected_unit)  # Met à jour l'effet, par exemple, un changement de vitesse
             
-            # 更新当前单位的移动范围
+            # Met à jour la portée de déplacement de l'unité
             selected_unit.update_move_range()
-            selected_unit.draw_move_range(self.screen)#高亮能走到的范围
+            selected_unit.draw_move_range(self.screen)# Met en surbrillance les cases accessibles
 
             #Affichage du HUD
             self.flip_display()
@@ -326,8 +323,7 @@ class Game:
             temp1 = selected_unit.x
             temp2 = selected_unit.y
 
-            has_acted = False # 标记该单位是否完成行动，目前没有完成行动
-
+            has_acted = False# Indique si l'unité a terminé son action, initialement elle ne l'a pas encore fait
 
             chemin_police = "police/police.TTF"
             
@@ -429,25 +425,22 @@ class Game:
                             self.special_skill2 = True
 
                         
-                        #获取新位置
-                        
+                        # Obtenir la nouvelle position
                         new_x = selected_unit.x + dx
                         new_y = selected_unit.y + dy
                         
-                        
+                        # Vérifie si la nouvelle position est dans les cases accessibles (green_cases)
                         if (new_x, new_y) in selected_unit.green_cases:
                             
-                            # **移除当前地形效果**
+                           # **Supprimer l'effet du terrain actuel**
                             old_terrain = self.board.grid[selected_unit.y][selected_unit.x]
                             new_terrain = self.board.grid[new_y][new_x]   
                             
-                            old_terrain.remove_effect(selected_unit)  # 移除当前地形效果
-                            selected_unit.move(dx, dy)  # 执行移动                         
-                            new_terrain.apply_effect(selected_unit)  # 应用新地形效果
+                            old_terrain.remove_effect(selected_unit)  # Supprime l'effet du terrain actuel
+                            selected_unit.move(dx, dy) # Effectue le déplacement                       
+                            new_terrain.apply_effect(selected_unit)  # Applique l'effet du nouveau terrain
                             
-                            
-                                
-                            self.flip_display()  # 更新屏幕
+                            self.flip_display() 
                         
 
                         if attack: #attaque TOUS les ennemis qui sont à UN de distance.
@@ -674,7 +667,7 @@ class Game:
         """IA très simple pour les ennemis."""
         for enemy in self.enemy_units:
             
-            # 应用当前地形的停留效果
+            # Applique l'effet de séjour sur le terrain actuel
             current_terrain = self.board.grid[enemy.y][enemy.x]
             current_terrain.apply_effect(enemy)
             
@@ -687,13 +680,13 @@ class Game:
             dy = 1 if enemy.y < target.y else -1 if enemy.y > target.y else 0
             
             
-            #检查目标位置是否已被其他单位占据
+            # Vérifie si la position cible est occupée par une autre unité
             new_x, new_y = enemy.x + dx, enemy.y + dy
-            # 使用is_occupied方法检查该位置是否被占用
+            
             if not self.is_occupied(new_x, new_y):
                 enemy.move(dx, dy)
 
-                # 重新应用移动后的地形效果
+                # Réapplique les effets du terrain après le déplacement
                 current_terrain = self.board.grid[enemy.y][enemy.x]
                 current_terrain.apply_effect(enemy)
             
@@ -720,7 +713,7 @@ class Game:
         #Affiche les terrains depuis le gameBoard
         self.board.draw(self.screen)
         
-        # 绘制当前选中单位的绿色格子
+        # Dessine la case verte de l'unité sélectionnée
         for unit in self.player_units:
             if unit.is_selected:
                 unit.draw_move_range(self.screen)
