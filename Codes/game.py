@@ -34,7 +34,7 @@ class GameBoard:
         """Place un terrain aléatoire en évitant les positions occupées et les cases d'eau"""
         available_positions = [
             (x, y) for x in range(self.size) for y in range(self.size)
-            if isinstance(self.grid[x][y], Terrain) and not isinstance(self.grid[x][y], Water)  # 避免覆盖水格子
+            if isinstance(self.grid[x][y], Terrain) and not isinstance(self.grid[x][y], Water)  # Éviter de couvrir les case water
             and (x, y) not in occupied_positions
         ]
         
@@ -653,11 +653,11 @@ class Game:
             
             
             
-            # 强制重置速度为原始速度
+             # Forcer la vitesse de réinitialisation à la vitesse d'origine
             selected_unit.speed = selected_unit.original_speed
             
             
-            self.flip_display()  # 每次单位行动完成后更新显示
+            self.flip_display()  
                         
 
     
